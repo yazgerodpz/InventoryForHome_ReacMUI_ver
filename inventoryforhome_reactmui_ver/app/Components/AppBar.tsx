@@ -11,6 +11,8 @@ import InboxIcon from '@mui/icons-material/MoveToInbox';
 import MailIcon from '@mui/icons-material/Mail';
 import HomeIcon from '@mui/icons-material/Home';
 import InventoryIcon from '@mui/icons-material/Inventory';
+import LowPriorityIcon from '@mui/icons-material/LowPriority';
+import TakeoutDiningIcon from '@mui/icons-material/TakeoutDining';
 
 import { Divider, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 
@@ -51,23 +53,23 @@ export default function ButtonAppBar() {
                         <ListItemIcon>
                             <InventoryIcon /> 
                         </ListItemIcon>
-                        <ListItemText primary={'PRUEBA'} />
+                        <ListItemText primary={'INVENTARIO'} />
                     </ListItemButton>
         </ListItem>
-        <ListItem key={'PRUEBA2'} disablePadding>
+        <ListItem key={'Regla de prioridad'} disablePadding>
                     <ListItemButton>
                         <ListItemIcon>
-                            <InboxIcon /> 
+                            <LowPriorityIcon /> 
                         </ListItemIcon>
-                        <ListItemText primary={'PRUEBA'} />
+                        <ListItemText primary={'REGLA DE PRIORIDAD'} />
                     </ListItemButton>
         </ListItem>
-        <ListItem key={'PRUEBA3'} disablePadding>
+        <ListItem key={'Empaques'} disablePadding>
                     <ListItemButton>
                         <ListItemIcon>
-                            <InboxIcon /> 
+                            <TakeoutDiningIcon /> 
                         </ListItemIcon>
-                        <ListItemText primary={'PRUEBA'} />
+                        <ListItemText primary={'EMPAQUES'} />
                     </ListItemButton>
         </ListItem>
       </List>
