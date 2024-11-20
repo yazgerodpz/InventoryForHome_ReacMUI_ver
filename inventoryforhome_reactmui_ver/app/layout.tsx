@@ -4,6 +4,7 @@ import "./globals.css";
 import AppBar from "./Components/AppBar";
 import SideBar from "./Components/SideBar";
 import INVENTARIO from "./Components/INVENTARIOpage";
+import Empaques from "./Empaques";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -32,7 +33,8 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <AppBar></AppBar>
-        <INVENTARIO></INVENTARIO>
+        {/* <INVENTARIO></INVENTARIO> */}
+        {/* <Empaques></Empaques> */}
           {children}
       </body>
     </html>
