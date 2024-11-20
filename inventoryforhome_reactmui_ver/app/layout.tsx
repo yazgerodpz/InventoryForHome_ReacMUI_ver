@@ -33,8 +33,6 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <AppBar></AppBar>
-        {/* <INVENTARIO></INVENTARIO> */}
-        {/* <Empaques></Empaques> */}
           {children}
       </body>
     </html>

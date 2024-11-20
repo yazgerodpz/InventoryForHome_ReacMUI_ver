@@ -9,6 +9,15 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import Empaques from './Empaques';
 import Inventario from './Inventario';
 import ReglaPrio from './Prioridad';
+import FormEmpC from './Components/FormEmpC';
+import FormEmpU from './Components/FormEmpU';
+import FormEmpD from './Components/FormEmpD';
+import FormPrioC from './Components/FormPrioC';
+import FormPrioU from './Components/FormPrioU';
+import FormPrioD from './Components/FormPrioD';
+import FormInvC from './Components/FormInvC';
+import FormInvU from './Components/FormInvU';
+import FormInvD from './Components/FormInvD';
 
 
 export default function Home() {
@@ -39,15 +48,24 @@ export default function Home() {
         <ReglaPrio></ReglaPrio>
         TABLA STOCKTYPE
         <Empaques></Empaques>
-        FOrmC
-        FOrmC
-        FOrmC
-        FoRME
-        FoRME
-        FoRME
-        formD
-        formD
-        formD
+        FormEmpC
+        <FormEmpC></FormEmpC>
+        FormEmpU
+        <FormEmpU></FormEmpU>
+        FormEmpD
+        <FormEmpD></FormEmpD>
+        FormPrioC
+        <FormPrioC></FormPrioC>
+        FormPrioU
+        <FormPrioU></FormPrioU>
+        FormPrioD
+        <FormPrioD></FormPrioD>
+        FormIvnC
+        <FormInvC></FormInvC>
+        FormIvnU
+        <FormInvU></FormInvU>
+        FormIvnD
+        <FormInvD></FormInvD>
       </main>
 
       <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
