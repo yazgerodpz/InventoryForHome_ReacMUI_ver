@@ -1,5 +1,9 @@
 "use client";
 import React, { useState } from 'react';
+import { Typography, TextField, Button, FormControlLabel, Switch } from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
+import CancelIcon from '@mui/icons-material/Cancel';
+import SearchIcon from '@mui/icons-material/Search';
 
 interface TypeStock {
     idTypeStock: number;
@@ -48,31 +52,41 @@ const FormEmpD: React.FC = () => {
 
     return (
         <div>
+            <Typography variant="h5" gutterBottom>
+                Formulario eliminar empaques
+            </Typography>
             <div>
-                <label>Search by ID:</label>
-                <input
+                {/* <label>Search by ID:</label>
+                    <input
+                        type="number"
+                        value={searchId}
+                        onChange={(e) => setSearchId(e.target.value ? Number(e.target.value) : '')} /> */}
+                <TextField
+                    id="searchId"
+                    label="Buscar por ID"
                     type="number"
                     value={searchId}
                     onChange={(e) => setSearchId(e.target.value ? Number(e.target.value) : '')}
+                    InputLabelProps={{
+                        shrink: true, // Mantiene la etiqueta flotando
+                    }}
                 />
-                <button type="button" onClick={handleSearch}>
-                    Search
-                </button>
+                <Button type="button" onClick={handleSearch} variant="contained" startIcon={<SearchIcon />}>Buscar</Button>
             </div>
 
             {formData && (
                 <div>
-                    <h3>TypeStock Details:</h3>
+                    <h3>Datos del empaque:</h3>
                     <p>
-                        <strong>Type Stock Name:</strong> {formData.typeStockName}
+                        <strong>Nombre del empaque:</strong> {formData.typeStockName}
                     </p>
 
-                    <button type="button" onClick={handleDelete}>
+                    <Button color="secondary" type="button" onClick={handleDelete} variant="contained" startIcon={<DeleteIcon />} className="button-spacing">
                         Delete
-                    </button>
-                    <button type="button" onClick={handleCancel}>
-                        Cancel
-                    </button>
+                    </Button>
+                    <Button color="error" type="button" onClick={handleCancel} variant="contained" startIcon={<CancelIcon />}>
+                        Cancelar
+                    </Button>
                 </div>
             )}
         </div>

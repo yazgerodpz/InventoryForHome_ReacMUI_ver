@@ -1,5 +1,6 @@
 "use client";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import { Typography } from "@mui/material";
 
 const Empaques = () => {
   // Datos actualizados
@@ -24,6 +25,9 @@ const Empaques = () => {
 
   return (
     <div style={{ height: 400, width: "100%" }}>
+      <Typography variant="h5" gutterBottom>
+        Empaques
+      </Typography>
       <DataGrid rows={rows} columns={columns} pageSize={5} checkboxSelection />
     </div>
   );

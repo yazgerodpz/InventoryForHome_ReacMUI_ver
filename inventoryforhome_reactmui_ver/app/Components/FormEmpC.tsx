@@ -1,5 +1,8 @@
 "use client";
+import { Button, FormControlLabel, Switch, TextField, Typography } from '@mui/material';
 import React, { useState } from 'react';
+import SaveIcon from '@mui/icons-material/Save';
+import CancelIcon from '@mui/icons-material/Cancel';
 
 interface TypeStock {
     typeStockName: string; // Nombre del tipo de stock
@@ -35,30 +38,38 @@ const FormEmpC = () => {
 
     return (
         <form onSubmit={handleSubmit}>
+            <Typography variant="h5" gutterBottom>
+                Formulario Crear Empaque
+            </Typography>
             <div>
-                <label htmlFor="typeStockName">Nombre del nuevo empaque:</label>
-                <input
-                    type="text"
-                    id="typeStockName"
+                <TextField 
+                    id="typeStockName" 
+                    label="Nombre del empaque" 
                     name="typeStockName"
                     value={formData.typeStockName}
                     onChange={handleChange}
+                    variant="outlined" 
                     required
-                />
+                    />
             </div>
             <div>
-                <label htmlFor="active">Activo:</label>
-                <input
-                    type="checkbox"
-                    id="active"
-                    name="active"
-                    checked={formData.active}
-                    onChange={handleChange}
-                />
+                <FormControlLabel control=
+                    {
+                        <Switch 
+                            id="active" 
+                            name="active" 
+                            checked={formData.active}
+                            onChange={handleChange} />
+                    } 
+                    labelPlacement="start"
+                    label="Activo" />
             </div>
-            <button type="submit">Guardar</button>
-            
-            <button type="button" onClick={handleCancel}>Cancelar</button>
+            <Button color="success" type="submit" variant="contained" startIcon={<SaveIcon />}className="button-spacing">
+                Guardar
+            </Button>            
+            <Button color="error" type="button" onClick={handleCancel} variant="contained" startIcon={<CancelIcon />}>
+                Cancelar
+            </Button>
         </form>
     );
 };

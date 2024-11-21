@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import { DataGrid, GridColDef, GridRowsProp } from "@mui/x-data-grid";
+import { Typography } from "@mui/material";
 
 
 const Inventario = () => {
@@ -70,6 +71,9 @@ const Inventario = () => {
 
   return (
     <div style={{ height: 500, width: "100%" }}>
+      <Typography variant="h5" gutterBottom>
+        Inventario
+      </Typography>
       <DataGrid
         rows={rows}
         columns={columns}

@@ -1,5 +1,9 @@
 "use client";
+import { Typography, TextField, Button, FormControlLabel, Switch } from '@mui/material';
 import React, { useState } from 'react';
+import SaveIcon from '@mui/icons-material/Save';
+import CancelIcon from '@mui/icons-material/Cancel';
+import SearchIcon from '@mui/icons-material/Search';
 
 interface TypeStock {
     idTypeStock: number;
@@ -63,44 +67,65 @@ const FormEmpU = () => {
 
     return (
         <form onSubmit={handleSubmit}>
+             <Typography variant="h5" gutterBottom>
+                Formulario actualizar empaques
+            </Typography>
             <div>
-                <label htmlFor="searchId">Buscar por ID:</label>
+                {/* <label htmlFor="searchId">Buscar por ID:</label>
                 <input
                     type="number"
                     id="searchId"
                     value={searchId}
                     onChange={(e) => setSearchId(Number(e.target.value))}
                     placeholder="Ingresa ID"
+                /> */}
+                <TextField
+                    id="searchId"
+                    label="Buscar por ID"
+                    type="number"
+                    value={searchId}
+                    onChange={(e) => setSearchId(Number(e.target.value))}
+                    slotProps={{
+                        inputLabel: {
+                        shrink: true,
+                        },
+                    }}
                 />
-                <button type="button" onClick={handleSearch}>Buscar</button>
+                <Button type="button" onClick={handleSearch} variant="contained" startIcon={<SearchIcon/>}>Buscar</Button>
             </div>
 
             {message && <p>{message}</p>}
 
             <div>
-                <label htmlFor="typeStockName">Nombre del Tipo de Stock:</label>
-                <input
-                    type="text"
-                    id="typeStockName"
+                <TextField 
+                    id="typeStockName" 
+                    label="Nombre del empaque" 
                     name="typeStockName"
                     value={formData.typeStockName}
                     onChange={handleChange}
+                    variant="outlined" 
                     required
-                />
+                    style={{ marginTop: '10px' }}
+                    />
             </div>
             <div>
-                <label htmlFor="active">Activo:</label>
-                <input
-                    type="checkbox"
-                    id="active"
-                    name="active"
-                    checked={formData.active}
-                    onChange={handleChange}
-                />
+                <FormControlLabel control=
+                    {
+                        <Switch 
+                            id="active" 
+                            name="active" 
+                            checked={formData.active}
+                            onChange={handleChange} />
+                    } 
+                    labelPlacement="start"
+                    label="Activo" />
             </div>
-
-            <button type="submit">Guardar</button>
-            <button type="button" onClick={handleCancel}>Cancelar</button>
+            <Button color="success" type="submit" variant="contained" startIcon={<SaveIcon />}className="button-spacing">
+                Guardar
+            </Button>            
+            <Button color="error" type="button" onClick={handleCancel} variant="contained" startIcon={<CancelIcon />}>
+                Cancelar
+            </Button>
         </form>
     );
 };

@@ -26,3 +26,7 @@ button {
   margin-right: 10px; /* Espacio entre los botones */
   background-color: var(--colorbutton) ;
 }
+
+.button-spacing {
+  margin-right: 16px; /* Ajusta el valor según necesites */
+}
