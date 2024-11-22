@@ -83,7 +83,7 @@ const FormEmpU = () => {
                     id="searchId"
                     label="Buscar por ID"
                     type="number"
-                    value={searchId}
+                    value={searchId ?? ''}
                     onChange={(e) => setSearchId(Number(e.target.value))}
                     slotProps={{
                         inputLabel: {
