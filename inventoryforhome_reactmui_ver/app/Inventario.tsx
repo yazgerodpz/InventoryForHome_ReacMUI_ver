@@ -45,22 +45,20 @@ const Inventario = () => {
     { field: "cantidad", headerName: "Cantidad", type: "number", width: 120 },
     { field: "empaque", headerName: "Empaque", width: 120 },
     { field: "reglaPrioridad", headerName: "Regla de Prioridad", width: 150 },
-    // {
-    //   field: "fechaCompra",
-    //   headerName: "Fecha de Compra",
-    //   type: "date",
-    //   width: 150,
-    //   valueGetter: (params) =>
-    //     params.row.fechaCompra ? new Date(params.row.fechaCompra) : null, // Validación
-    // },
-    // {
-    //   field: "fechaExpiracion",
-    //   headerName: "Fecha de Expiración",
-    //   type: "date",
-    //   width: 180,
-    //   valueGetter: (params) =>
-    //     params.row.fechaExpiracion ? new Date(params.row.fechaExpiracion) : null, // Validación
-    // },
+    {
+      field: "fechaCompra",
+      headerName: "Fecha de Compra",
+      type: "date",
+      width: 150,
+      valueGetter: (value, row) => new Date(row.fechaCompra),
+    },
+    {
+      field: "fechaExpiracion",
+      headerName: "Fecha de Expiración",
+      type: "date",
+      width: 180,
+      valueGetter: (value, row) => new Date(row.fechaExpiracion),
+    },
     {
       field: "activo",
       headerName: "Activo",
@@ -77,9 +75,8 @@ const Inventario = () => {
       <DataGrid
         rows={rows}
         columns={columns}
-        pageSize={5}
+        pageSizeOptions={[25, 50, 100]}
         checkboxSelection
-        disableSelectionOnClick
       />
     </div>
   );

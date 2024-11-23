@@ -93,7 +93,7 @@ const FormPrioU: React.FC = () => {
   return (
     <form onSubmit={handleSubmit}>
       <Typography variant="h5" gutterBottom>
-        Formulario actualizar empaques
+        Formulario actualizar reglas de prioridad
       </Typography>
       <div>
         {/* <label htmlFor="searchId">Buscar por ID:</label>
@@ -118,16 +118,16 @@ const FormPrioU: React.FC = () => {
       </div>
 
       <div>
-        <TextField 
-                    id="TypePrioritaryName" 
-                    label="Nueva regla" 
-                    name="TypePrioritaryName"
-                    value={formData.TypePrioritaryName}
-                    onChange={handleChange}
-                    variant="outlined" 
-                    required
-                    style={{ marginTop: '10px' }}
-                    />
+        <TextField
+          id="TypePrioritaryName"
+          label="Nueva regla"
+          name="TypePrioritaryName"
+          value={formData.TypePrioritaryName}
+          onChange={handleChange}
+          variant="outlined"
+          required
+          style={{ marginTop: '10px' }}
+        />
       </div>
       <div>
         <TextField
@@ -145,32 +145,24 @@ const FormPrioU: React.FC = () => {
         />
       </div>
       <div>
-        {/* <label htmlFor="Active">Activo:</label>
-        <input
-          type="checkbox"
-          id="Active"
-          name="Active"
-          checked={formData.Active}
-          onChange={handleCheckboxChange}
-        /> */}
         <FormControlLabel control=
-                    {
-                        <Switch 
-                            id="Active" 
-                            name="Active" 
-                            checked={formData.Active}
-                            onChange={handleCheckboxChange} />
-                    } 
-                    labelPlacement="start"
-                    label="Activo" />
+          {
+            <Switch
+              id="Active"
+              name="Active"
+              checked={formData.Active}
+              onChange={handleCheckboxChange} />
+          }
+          labelPlacement="start"
+          label="Activo" />
       </div>
       <div>
-      <Button color="success" type="submit" variant="contained" startIcon={<SaveIcon />}className="button-spacing">
-                Guardar
-            </Button>            
-            <Button color="error" type="button" onClick={handleCancel} variant="contained" startIcon={<CancelIcon />}>
-                Cancelar
-            </Button>
+        <Button color="success" type="submit" variant="contained" startIcon={<SaveIcon />} className="button-spacing">
+          Guardar
+        </Button>
+        <Button color="error" type="button" onClick={handleCancel} variant="contained" startIcon={<CancelIcon />}>
+          Cancelar
+        </Button>
       </div>
     </form>
   );

@@ -1,5 +1,8 @@
 "use client";
 import React, { useState } from 'react';
+import { Typography, TextField, Button, Switch, Select, MenuItem, FormControl, InputLabel, FormControlLabel } from '@mui/material';
+import SaveIcon from '@mui/icons-material/Save';
+import CancelIcon from '@mui/icons-material/Cancel';
 
 interface Item {
     itemName: string;
@@ -10,6 +13,10 @@ interface Item {
     expirationDate: Date;
     active: boolean;
 }
+
+// Opciones para los selectores
+const priorityOptions = ['Alta', 'Media', 'Baja'];
+const stockTypeOptions = ['Caja', 'Bolsa', 'Palet'];
 
 const FormInvC: React.FC = () => {
     const [formData, setFormData] = useState<Item>({
@@ -58,77 +65,114 @@ const FormInvC: React.FC = () => {
     };
 
     return (
-        <form onSubmit={handleSubmit}>
-            <div>
-                <label>Nombre del nuevo artículo:</label>
-                <input
-                    type="text"
-                    name="itemName"
-                    value={formData.itemName}
-                    onChange={handleChange}
-                />
-            </div>
-            <div>
-                <label>Cantidad:</label>
-                <input
-                    type="number"
-                    name="stock"
-                    value={formData.stock}
-                    onChange={handleChange}
-                />
-            </div>
-            <div>
-                <label>Regla de prioridad:</label>
-                <input
-                    type="text"
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+            <Typography variant="h5" gutterBottom>
+                Formulario Crear nuevo artículo
+            </Typography>
+            <TextField
+                id="itemName"
+                label="Nombre del nuevo artículo"
+                name="itemName"
+                value={formData.itemName}
+                onChange={handleChange}
+                variant="outlined"
+                required
+            />
+            <TextField
+                id="stock"
+                label="Cantidad"
+                type="number"
+                name="stock"
+                value={formData.stock}
+                onChange={handleChange}
+                variant="outlined"
+                required
+            />
+            <FormControl variant="outlined" required>
+                <InputLabel id="typePrioritaryName-label">Regla de prioridad</InputLabel>
+                <Select
+                    labelId="typePrioritaryName-label"
+                    id="typePrioritaryName"
                     name="typePrioritaryName"
                     value={formData.typePrioritaryName}
                     onChange={handleChange}
-                />
-            </div>
-            <div>
-                <label>Tipo de empaque:</label>
-                <input
-                    type="text"
+                    label="Regla de prioridad"
+                >
+                    <MenuItem value="">
+                        <em>Seleccione una opción</em>
+                    </MenuItem>
+                    {priorityOptions.map((option) => (
+                        <MenuItem key={option} value={option}>
+                            {option}
+                        </MenuItem>
+                    ))}
+                </Select>
+            </FormControl>
+            <FormControl variant="outlined" required>
+                <InputLabel id="typeStockName-label">Tipo de empaque</InputLabel>
+                <Select
+                    labelId="typeStockName-label"
+                    id="typeStockName"
                     name="typeStockName"
                     value={formData.typeStockName}
                     onChange={handleChange}
-                />
+                    label="Tipo de empaque"
+                >
+                    <MenuItem value="">
+                        <em>Seleccione una opción</em>
+                    </MenuItem>
+                    {stockTypeOptions.map((option) => (
+                        <MenuItem key={option} value={option}>
+                            {option}
+                        </MenuItem>
+                    ))}
+                </Select>
+            </FormControl>
+            <TextField
+                id="purchesDate"
+                label="Fecha de compra"
+                type="date"
+                name="purchesDate"
+                value={formData.purchesDate.toISOString().split('T')[0]}
+                onChange={handleDateChange}
+                InputLabelProps={{
+                    shrink: true,
+                }}
+                variant="outlined"
+                required
+            />
+            <TextField
+                id="expirationDate"
+                label="Fecha de expiración"
+                type="date"
+                name="expirationDate"
+                value={formData.expirationDate.toISOString().split('T')[0]}
+                onChange={handleDateChange}
+                InputLabelProps={{
+                    shrink: true,
+                }}
+                variant="outlined"
+                required
+            />
+            <div>
+                <FormControlLabel control=
+                    {
+                        <Switch
+                            id="active"
+                            name="active"
+                            checked={formData.active}
+                            onChange={handleChange} />
+                    }
+                    labelPlacement="start"
+                    label="Activo" />
             </div>
             <div>
-                <label>Fecha de compra:</label>
-                <input
-                    type="date"
-                    name="purchesDate"
-                    value={formData.purchesDate.toISOString().split('T')[0]}
-                    onChange={handleDateChange}
-                />
-            </div>
-            <div>
-                <label>Fecha de expiración:</label>
-                <input
-                    type="date"
-                    name="expirationDate"
-                    value={formData.expirationDate.toISOString().split('T')[0]}
-                    onChange={handleDateChange}
-                />
-            </div>
-            <div>
-                <label>
-                    Active:
-                    <input
-                        type="checkbox"
-                        name="active"
-                        checked={formData.active}
-                        onChange={handleChange}
-                    />
-                </label>
-            </div>
-            <div>
-                <button type="submit">Guardar</button>
-                <button type="button" onClick={handleCancel}>
-                    Cancel
-                </button>
+                <Button color="success" type="submit" variant="contained" startIcon={<SaveIcon />} className="button-spacing">
+                    Guardar
+                </Button>
+                <Button color="error" type="button" onClick={handleCancel} variant="contained" startIcon={<CancelIcon />}>
+                    Cancelar
+                </Button>
             </div>
         </form>
     );

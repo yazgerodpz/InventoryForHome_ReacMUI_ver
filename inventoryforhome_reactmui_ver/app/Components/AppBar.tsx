@@ -13,6 +13,8 @@ import HomeIcon from '@mui/icons-material/Home';
 import InventoryIcon from '@mui/icons-material/Inventory';
 import LowPriorityIcon from '@mui/icons-material/LowPriority';
 import TakeoutDiningIcon from '@mui/icons-material/TakeoutDining';
+import { Link, useNavigate } from 'react-router-dom';  // Importar Link y useNavigate
+
 
 import { Divider, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 
@@ -23,6 +25,14 @@ export default function ButtonAppBar() {
   const toggleDrawer = (newOpen: boolean) => () => {
     setOpen(newOpen);
   };
+ 
+  // const navigate = useNavigate();  // Hook de navegación
+
+  const handleNavigation = (path: string) => {
+    // navigate(path);
+    setOpen(false);  // Cerrar el drawer al hacer clic en un enlace
+  };
+
 
   //AQUI ESTA EL CAJON DE MENU
   const DrawerList = (
@@ -40,7 +50,7 @@ export default function ButtonAppBar() {
                 </ListItem>
             );
         })} */}
-        <ListItem key={'Incio'} disablePadding>
+        <ListItem key={'Incio'} disablePadding  onClick={() => handleNavigation('/')}>
             <ListItemButton>
                 <ListItemIcon>
                     <HomeIcon /> 
@@ -65,7 +75,7 @@ export default function ButtonAppBar() {
                     </ListItemButton>
         </ListItem>
         <ListItem key={'Empaques'} disablePadding>
-                    <ListItemButton>
+                    <ListItemButton onClick={() => handleNavigation('/Empaques')}>
                         <ListItemIcon>
                             <TakeoutDiningIcon /> 
                         </ListItemIcon>

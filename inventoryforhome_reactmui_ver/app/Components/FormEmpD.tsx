@@ -8,6 +8,7 @@ import SearchIcon from '@mui/icons-material/Search';
 interface TypeStock {
     idTypeStock: number;
     typeStockName: string;
+    active: boolean;
 }
 
 const FormEmpD: React.FC = () => {
@@ -19,10 +20,12 @@ const FormEmpD: React.FC = () => {
         1: {
             idTypeStock: 1,
             typeStockName: 'Box',
+            active: true
         },
         2: {
             idTypeStock: 2,
             typeStockName: 'Bag',
+            active: true
         },
     };
 
@@ -79,6 +82,19 @@ const FormEmpD: React.FC = () => {
                     <h3>Datos del empaque:</h3>
                     <p>
                         <strong>Nombre del empaque:</strong> {formData.typeStockName}
+                    </p>
+                    <p>
+                        <FormControlLabel
+                        control={
+                            <Switch
+                                id="active"
+                                name="active"
+                                checked={formData.active}
+                                readOnly
+                            />
+                        }
+                        label="Activo"
+                    />
                     </p>
 
                     <Button color="secondary" type="button" onClick={handleDelete} variant="contained" startIcon={<DeleteIcon />} className="button-spacing">

@@ -1,5 +1,9 @@
 "use client";
 import React, { useState } from 'react';
+import { Typography, TextField, Button, Box, FormControlLabel, Switch } from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
+import CancelIcon from '@mui/icons-material/Cancel';
+import SearchIcon from '@mui/icons-material/Search';
 
 interface TypePrioritary {
     IdTypePrioritary: number;
@@ -51,16 +55,27 @@ const FormPrioD: React.FC = () => {
 
     return (
         <div>
+            <Typography variant="h5" gutterBottom>
+                Formulario eliminar regla de prioridad
+            </Typography>
             <div>
-                <label>Search by ID:</label>
+                {/* <label>Search by ID:</label>
                 <input
                     type="number"
                     value={searchId}
                     onChange={(e) => setSearchId(e.target.value ? Number(e.target.value) : '')}
+                /> */}
+                <TextField
+                    id="searchId"
+                    label="Buscar por ID"
+                    type="number"
+                    value={searchId}
+                    onChange={(e) => setSearchId(e.target.value ? Number(e.target.value) : '')}
+                    InputLabelProps={{
+                        shrink: true, // Mantiene la etiqueta flotando
+                    }}
                 />
-                <button type="button" onClick={handleSearch}>
-                    Search
-                </button>
+                <Button type="button" onClick={handleSearch} variant="contained" startIcon={<SearchIcon />}>Buscar</Button>
             </div>
 
             {formData && (
@@ -73,12 +88,13 @@ const FormPrioD: React.FC = () => {
                         <strong>Description:</strong> {formData.Description}
                     </p>
 
-                    <button type="button" onClick={handleDelete}>
+                    
+                    <Button color="secondary" type="button" onClick={handleDelete} variant="contained" startIcon={<DeleteIcon />} className="button-spacing">
                         Delete
-                    </button>
-                    <button type="button" onClick={handleCancel}>
-                        Cancel
-                    </button>
+                    </Button>
+                    <Button color="error" type="button" onClick={handleCancel} variant="contained" startIcon={<CancelIcon />}>
+                        Cancelar
+                    </Button>
                 </div>
             )}
         </div>
