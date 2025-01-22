@@ -27,11 +27,12 @@ const ReglaPrio = () => {
   ];
 
   return (
-    <div style={{ height: 400, width: "100%" }}>
+    <div style={{ height: 400, width: "75%", margin: "0 auto", display: "block" }}>
+      <br/>
       <Typography variant="h5" gutterBottom>
         Reglas de prioridad
       </Typography>
-      <DataGrid rows={rows} columns={columns} pageSize={5} checkboxSelection />
+      <DataGrid rows={rows} columns={columns} checkboxSelection />
     </div>
   );
 

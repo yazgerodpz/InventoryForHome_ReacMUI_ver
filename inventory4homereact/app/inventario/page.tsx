@@ -68,7 +68,8 @@ const Inventario = () => {
   ];
 
   return (
-    <div style={{ height: 500, width: "100%" }}>
+    <div style={{ height: 400, width: "75%", margin: "0 auto", display: "block" }}>
+      <br/>
       <Typography variant="h5" gutterBottom>
         Inventario
       </Typography>

@@ -2,7 +2,7 @@
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { Typography } from "@mui/material";
 import { useEffect, useState } from "react";
-import apiServices from "./Services/apiServices";
+import apiServices from "../Services/apiServices";
 
 // Definir las interfaces
 interface empMain {
@@ -44,14 +44,6 @@ const Empaques: React.FC = () => {
     }
   };
 
-
-
-  const rows = [
-    { id: 1, empaque: "Caja", activo: true },
-    { id: 2, empaque: "Bolsa", activo: false },
-    { id: 3, empaque: "Palet", activo: true },
-  ];
-
   const columns: GridColDef[] = [
     { field: "idTypeStock", headerName: "Id", width: 70 },
     { field: "typeStockName", headerName: "Nombre de Empaque", width: 300 },
@@ -79,7 +71,8 @@ useEffect(() => {
 }, [mainEmp]);
 
   return (
-    <div style={{ height: 400, width: "75%" }}>
+    <div style={{ height: 400, width: "75%", margin: "0 auto", display: "block" }}>
+      <br/>
       <Typography variant="h5" gutterBottom>
         Empaques
       </Typography>
