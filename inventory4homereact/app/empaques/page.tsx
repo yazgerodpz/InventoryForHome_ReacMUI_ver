@@ -16,8 +16,6 @@ interface empApiMain {
   data: empMain[];
 }
 
-
-
 const Empaques: React.FC = () => {
   // Datos actualizados
 
