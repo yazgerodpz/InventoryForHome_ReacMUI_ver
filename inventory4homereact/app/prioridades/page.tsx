@@ -26,7 +26,7 @@ const ReglaPrio: React.FC = () => {
   // // Función para obtener datos de prioridades
   const getPrioridades = async () => {
     try {
-      const response = await apiServices.getData<prioApiMain>('Prioridades/ReadPrios');
+      const response = await apiServices.getData('Prioridades/ReadPrios') as prioApiMain;
       setResponseAPI(response); // Almacena la respuesta completa
       setMainPrio(response.data); // Extrae y almacena los datos de prioridades
     } catch (error) {
@@ -42,9 +42,7 @@ const ReglaPrio: React.FC = () => {
       field: "active",
       headerName: "Activo",
       width: 100,
-      renderCell: (params) => (
-        <span>{params.row.activo ? "Sí" : "No"}</span>
-      ),
+      renderCell: (params) => (<span>{params.value ? "Sí" : "No"}</span>)
     },
   ];
 
@@ -58,7 +56,7 @@ const ReglaPrio: React.FC = () => {
   }, [responseAPI]);
   
   useEffect(() => {
-    console.log("mainEmp ha cambiado:", mainPrio);  // Esto se ejecutará cuando `responseAPI` cambie
+    console.log("mainPrio ha cambiado:", mainPrio);  // Esto se ejecutará cuando `responseAPI` cambie
   }, [mainPrio]);
 
   return (
@@ -70,18 +68,6 @@ const ReglaPrio: React.FC = () => {
       <DataGrid rows={mainPrio} columns={columns}  getRowId={(row) => row.idTypePrioritary} />
     </div>
   );
-
-  // return (
-  //   <div style={{ height: 400, width: "100%" }}>
-  //     <DataGrid
-  //       rows={rows}
-  //       columns={columns}
-  //       pageSize={5}
-  //       checkboxSelection
-  //       disableSelectionOnClick
-  //     />
-  //   </div>
-  // );
 };
 
 export default ReglaPrio;

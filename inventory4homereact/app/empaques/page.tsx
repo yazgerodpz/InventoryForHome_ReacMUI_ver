@@ -1,6 +1,6 @@
 "use client";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import { Typography } from "@mui/material";
+import { Typography, Button, Stack } from "@mui/material";
 import { useEffect, useState } from "react";
 import apiServices from "../Services/apiServices";
 
@@ -42,6 +42,18 @@ const Empaques: React.FC = () => {
     }
   };
 
+  const handleAdd = () => {
+    alert("Agregar nuevo empaque");
+  };
+
+  const handleEdit = () => {
+    alert("Editar empaque seleccionado");
+  };
+
+  const handleDelete = () => {
+    alert("Eliminar empaque seleccionado");
+  };
+
   const columns: GridColDef[] = [
     { field: "idTypeStock", headerName: "Id", width: 70 },
     { field: "typeStockName", headerName: "Nombre de Empaque", width: 300 },
@@ -73,6 +85,19 @@ useEffect(() => {
       <br/>
       <Typography variant="h5" gutterBottom>
         Empaques
+       {/* Contenedor para los botones */}
+       <Stack direction="row" spacing={2} justifyContent="flex-end" marginBottom={2}>
+        <Button variant="contained" color="primary" onClick={handleAdd}>
+          Agregar
+        </Button>
+        <Button variant="contained" color="warning" onClick={handleEdit}>
+          Editar
+        </Button>
+        <Button variant="contained" color="error" onClick={handleDelete}>
+          Eliminar
+        </Button>
+      </Stack>
+      {/* {Tabla} */}
       </Typography>
       <DataGrid rows={mainEmp} columns={columns} getRowId={(row) => row.idTypeStock} />
     </div>
