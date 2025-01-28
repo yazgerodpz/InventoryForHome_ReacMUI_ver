@@ -59,11 +59,6 @@ const FormEmpD: React.FC = () => {
                 Formulario eliminar empaques
             </Typography>
             <div>
-                {/* <label>Search by ID:</label>
-                    <input
-                        type="number"
-                        value={searchId}
-                        onChange={(e) => setSearchId(e.target.value ? Number(e.target.value) : '')} /> */}
                 <TextField
                     id="searchId"
                     label="Buscar por ID"
@@ -76,13 +71,15 @@ const FormEmpD: React.FC = () => {
                 />
                 <Button type="button" onClick={handleSearch} variant="contained" startIcon={<SearchIcon />}>Buscar</Button>
             </div>
-
+                <br/>
             {formData && (
                 <div>
                     <h3>Datos del empaque:</h3>
+                    <br/>
                     <p>
                         <strong>Nombre del empaque:</strong> {formData.typeStockName}
                     </p>
+                    <br/>
                     <p>
                         <FormControlLabel
                         control={
