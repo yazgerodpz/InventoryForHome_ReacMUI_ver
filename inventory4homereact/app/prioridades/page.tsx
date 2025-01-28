@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import { Typography } from "@mui/material";
+import { Typography, Button, Stack } from "@mui/material";
 import apiServices from "../Services/apiServices";
 
 
@@ -34,6 +34,18 @@ const ReglaPrio: React.FC = () => {
     }
   };
 
+  const handleAdd = () => {
+    alert("Agregar nuevo empaque");
+  };
+
+  const handleEdit = () => {
+    alert("Editar empaque seleccionado");
+  };
+
+  const handleDelete = () => {
+    alert("Eliminar empaque seleccionado");
+  };
+
   const columns: GridColDef[] = [
     { field: "idTypePrioritary", headerName: "ID", width: 70 },
     { field: "typePrioritaryName", headerName: "Regla de Prioridad", width: 150 },
@@ -64,8 +76,21 @@ const ReglaPrio: React.FC = () => {
       <br/>
       <Typography variant="h5" gutterBottom>
         Reglas de prioridad
+        {/* Contenedor para los botones */}
+       <Stack direction="row" spacing={2} justifyContent="flex-end" marginBottom={2}>
+          <Button variant="contained" color="primary" onClick={handleAdd}>
+            Agregar
+          </Button>
+          <Button variant="contained" color="warning" onClick={handleEdit}>
+            Editar
+          </Button>
+          <Button variant="contained" color="error" onClick={handleDelete}>
+            Eliminar
+          </Button>
+        </Stack>
+        {/* {Tabla} */}
       </Typography>
-      <DataGrid rows={mainPrio} columns={columns}  getRowId={(row) => row.idTypePrioritary} />
+        <DataGrid rows={mainPrio} columns={columns}  getRowId={(row) => row.idTypePrioritary} />
     </div>
   );
 };
