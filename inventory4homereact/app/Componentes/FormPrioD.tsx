@@ -77,18 +77,19 @@ const FormPrioD: React.FC = () => {
                 />
                 <Button type="button" onClick={handleSearch} variant="contained" startIcon={<SearchIcon />}>Buscar</Button>
             </div>
-
+            <br/>
             {formData && (
                 <div>
                     <h3>TypePrioritary Details:</h3>
+                    <br/>
                     <p>
                         <strong>Type Prioritary Name:</strong> {formData.TypePrioritaryName}
                     </p>
+                    <br/>
                     <p>
                         <strong>Description:</strong> {formData.Description}
                     </p>
-
-                    
+                    <br/>
                     <Button color="secondary" type="button" onClick={handleDelete} variant="contained" startIcon={<DeleteIcon />} className="button-spacing">
                         Delete
                     </Button>

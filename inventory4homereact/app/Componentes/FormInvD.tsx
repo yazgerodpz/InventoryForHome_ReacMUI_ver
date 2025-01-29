@@ -92,28 +92,35 @@ const FormInvD: React.FC = () => {
                 />
                 <Button type="button" onClick={handleSearch} variant="contained" startIcon={<SearchIcon />}>Buscar</Button>
             </div>
-
+            <br/>
             {formData && (
                 <div>
                     <h3>Item Details:</h3>
+                    <br/>
                     <p>
                         <strong>Name:</strong> {formData.itemName}
                     </p>
+                    <br/>
                     <p>
                         <strong>Stock:</strong> {formData.stock}
                     </p>
+                    <br/>
                     <p>
                         <strong>Type Prioritary:</strong> {formData.typePrioritaryName}
                     </p>
+                    <br/>
                     <p>
                         <strong>Type Stock:</strong> {formData.typeStockName}
                     </p>
+                    <br/>
                     <p>
                         <strong>Purchase Date:</strong> {formData.purchesDate.toDateString()}
                     </p>
+                    <br/>
                     <p>
                         <strong>Expiration Date:</strong> {formData.expirationDate.toDateString()}
                     </p>
+                    <br/>
                     <p>
                         <FormControlLabel
                         control={
@@ -127,7 +134,7 @@ const FormInvD: React.FC = () => {
                         label="Activo"
                     />
                     </p>
-
+                    <br/>
                     <Button color="secondary" type="button" onClick={handleDelete} variant="contained" startIcon={<DeleteIcon />} className="button-spacing">
                         Delete
                     </Button>

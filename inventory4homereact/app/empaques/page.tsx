@@ -60,24 +60,6 @@ const Empaques: React.FC = () => {
     setActiveForm(null);
   };
 
-  // const handleAdd = () => {
-  //   setOpenDialog(true); // Abrir el diálogo
-  // };
-
-  // const handleCloseDialog = () => {
-  //   setOpenDialog(false); // Cerrar el diálogo
-  // };
-
-  // const handleEdit = () => {
-  //   // alert("Editar empaque seleccionado");
-  //   setOpenDialog(true); // Abrir el diálogo
-  // };
-
-  // const handleDelete = () => {
-  //   // alert("Eliminar empaque seleccionado");
-  //   setOpenDialog(true); // Abrir el diálogo
-  // };
-
   const columns: GridColDef[] = [
     { field: "idTypeStock", headerName: "Id", width: 70 },
     { field: "typeStockName", headerName: "Nombre de Empaque", width: 300 },

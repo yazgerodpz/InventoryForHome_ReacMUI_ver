@@ -1,9 +1,11 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import { Typography, Button, Stack } from "@mui/material";
+import { Typography, Button, Stack, Dialog, DialogTitle, DialogContent, DialogActions  } from "@mui/material";
 import apiServices from "../Services/apiServices";
-
+import FormPrioC from '../Componentes/FormPrioC';
+import FormPrioU from '../Componentes/FormPrioU';
+import FormPrioD from '../Componentes/FormPrioD';
 
 interface prioMain {
   idTypePrioritary: number;
@@ -23,6 +25,10 @@ const ReglaPrio: React.FC = () => {
   const [responseAPI, setResponseAPI] = useState<prioApiMain | null>(null); // Estado para la respuesta de la API
   const [mainPrio, setMainPrio] = useState<prioMain[]>([]); // Estado para la lista de prioridades
 
+  // Estado para el diálogo del formulario
+  const [openDialog, setOpenDialog] = useState(false);
+  const [activeForm, setActiveForm] = useState<"create" | "update" | "delete" | null>(null);
+
   // // Función para obtener datos de prioridades
   const getPrioridades = async () => {
     try {
@@ -34,16 +40,15 @@ const ReglaPrio: React.FC = () => {
     }
   };
 
-  const handleAdd = () => {
-    alert("Agregar nuevo empaque");
+  // Funciones para abrir los diálogos según el formulario
+  const handleOpenDialog = (formType: "create" | "update" | "delete") => {
+    setActiveForm(formType);
+    setOpenDialog(true);
   };
 
-  const handleEdit = () => {
-    alert("Editar empaque seleccionado");
-  };
-
-  const handleDelete = () => {
-    alert("Eliminar empaque seleccionado");
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+    setActiveForm(null);
   };
 
   const columns: GridColDef[] = [
@@ -76,21 +81,39 @@ const ReglaPrio: React.FC = () => {
       <br/>
       <Typography variant="h5" gutterBottom>
         Reglas de prioridad
-        {/* Contenedor para los botones */}
-       <Stack direction="row" spacing={2} justifyContent="flex-end" marginBottom={2}>
-          <Button variant="contained" color="primary" onClick={handleAdd}>
+       {/* Contenedor para los botones */}
+        <Stack direction="row" spacing={2} justifyContent="flex-end" marginBottom={2}>
+          <Button variant="contained" color="primary" onClick={() => handleOpenDialog("create")}>
             Agregar
           </Button>
-          <Button variant="contained" color="warning" onClick={handleEdit}>
+          <Button variant="contained" color="warning" onClick={() => handleOpenDialog("update")}>
             Editar
           </Button>
-          <Button variant="contained" color="error" onClick={handleDelete}>
+          <Button variant="contained" color="error" onClick={() => handleOpenDialog("delete")}>
             Eliminar
           </Button>
         </Stack>
         {/* {Tabla} */}
       </Typography>
         <DataGrid rows={mainPrio} columns={columns}  getRowId={(row) => row.idTypePrioritary} />
+           {/* Dialog Dinámico */}
+      <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
+        <DialogTitle>
+          {activeForm === "create" && "Agregar Nueva Reglad de Prioridad"}
+          {activeForm === "update" && "Editar Regla de Prioridad"}
+          {activeForm === "delete" && "Eliminar Regla de Prioridad"}
+        </DialogTitle>
+        <DialogContent>
+          {activeForm === "create" && <FormPrioC />}
+          {activeForm === "update" && <FormPrioU />}
+          {activeForm === "delete" && <FormPrioD />}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialog} color="error" variant="contained">
+            Cerrar
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };

@@ -1,8 +1,11 @@
 "use client";
-import { DataGrid, GridColDef, GridRowsProp } from "@mui/x-data-grid";
-import { Typography,  Button, Stack } from "@mui/material";
+import { DataGrid, GridColDef, } from "@mui/x-data-grid";
+import { Typography,  Button, Stack, Dialog, DialogTitle, DialogContent, DialogActions  } from "@mui/material";
 import apiServices from "../Services/apiServices";
 import React, { useState, useEffect } from 'react';
+import FormInvC from "../Componentes/FormInvC";
+import FormInvU from "../Componentes/FormInvU";
+import FormInvD from "../Componentes/FormInvD";
 
 interface DataItem {
   idItem: number;
@@ -25,6 +28,10 @@ const Inventario: React.FC = () => {
   const [responseAPI, setResponseAPI] = useState<ResponseApi | null>(null); // Estado para la respuesta de la API
   const [dataInventario, setDataInventario] = useState<DataItem[]>([]); // Estado para los datos del inventario
 
+  // Estado para el diálogo del formulario
+  const [openDialog, setOpenDialog] = useState(false);
+  const [activeForm, setActiveForm] = useState<"create" | "update" | "delete" | null>(null);
+
   // Función para obtener datos del inventario
   const getInventario = async () => {
     try {
@@ -36,16 +43,15 @@ const Inventario: React.FC = () => {
     }
   };
 
-  const handleAdd = () => {
-    alert("Agregar nuevo empaque");
+  // Funciones para abrir los diálogos según el formulario
+  const handleOpenDialog = (formType: "create" | "update" | "delete") => {
+    setActiveForm(formType);
+    setOpenDialog(true);
   };
 
-  const handleEdit = () => {
-    alert("Editar empaque seleccionado");
-  };
-
-  const handleDelete = () => {
-    alert("Eliminar empaque seleccionado");
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+    setActiveForm(null);
   };
 
   const columns: GridColDef[] = [
@@ -95,21 +101,39 @@ const Inventario: React.FC = () => {
       <Typography variant="h5" gutterBottom>
         Inventario
           {/* Contenedor para los botones */}
-        <Stack direction="row" spacing={2} justifyContent="flex-end" marginBottom={2}>
-          <Button variant="contained" color="primary" onClick={handleAdd}>
-            Agregar
-          </Button>
-          <Button variant="contained" color="warning" onClick={handleEdit}>
-            Editar
-          </Button>
-          <Button variant="contained" color="error" onClick={handleDelete}>
-            Eliminar
-          </Button>
-        </Stack>
+       <Stack direction="row" spacing={2} justifyContent="flex-end" marginBottom={2}>
+       <Button variant="contained" color="primary" onClick={() => handleOpenDialog("create")}>
+          Agregar
+        </Button>
+        <Button variant="contained" color="warning" onClick={() => handleOpenDialog("update")}>
+          Editar
+        </Button>
+        <Button variant="contained" color="error" onClick={() => handleOpenDialog("delete")}>
+          Eliminar
+        </Button>
+      </Stack>
         {/* {Tabla} */}
       </Typography>
         <DataGrid
           rows={dataInventario} columns={columns} getRowId={(row) => row.idItem} />
+           {/* Dialog Dinámico */}
+      <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
+        <DialogTitle>
+          {activeForm === "create" && "Agregar Nuevo Artículo"}
+          {activeForm === "update" && "Editar Artículo"}
+          {activeForm === "delete" && "Eliminar Artículo"}
+        </DialogTitle>
+        <DialogContent>
+          {activeForm === "create" && <FormInvC />}
+          {activeForm === "update" && <FormInvU />}
+          {activeForm === "delete" && <FormInvD />}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialog} color="error" variant="contained">
+            Cerrar
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };
