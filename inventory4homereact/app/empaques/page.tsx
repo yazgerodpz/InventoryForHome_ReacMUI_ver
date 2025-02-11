@@ -42,7 +42,7 @@ const Empaques: React.FC = () => {
       console.log(prueba);
       console.log(responseAPI);
       console.log(mainEmp);
-      
+
       //setMainEmp(responseAPI?.data); // Actualizar los datos de la tabla
     } catch (error) {
       console.error('ERROR AL TRAER DATOS:', error);
@@ -63,9 +63,9 @@ const Empaques: React.FC = () => {
   const columns: GridColDef[] = [
     { field: "idTypeStock", headerName: "Id", width: 70 },
     { field: "typeStockName", headerName: "Nombre de Empaque", width: 300 },
-    { 
-      field: "active", 
-      headerName: "Activo", 
+    {
+      field: "active",
+      headerName: "Activo",
       width: 100,
       renderCell: (params) => (
         <span>{params.value ? "Sí" : "No"}</span>
@@ -73,40 +73,40 @@ const Empaques: React.FC = () => {
     },
   ];
 
- // Llamar a la función al montar el componente
- useEffect(() => {
-  getEmpaques();
-}, []); // El array vacío asegura que solo se ejecute una vez al montar el componente
+  // Llamar a la función al montar el componente
+  useEffect(() => {
+    getEmpaques();
+  }, []); // El array vacío asegura que solo se ejecute una vez al montar el componente
 
-useEffect(() => {
-  console.log("responseAPI ha cambiado:", responseAPI);  // Esto se ejecutará cuando `responseAPI` cambie
-}, [responseAPI]);
+  useEffect(() => {
+    console.log("responseAPI ha cambiado:", responseAPI);  // Esto se ejecutará cuando `responseAPI` cambie
+  }, [responseAPI]);
 
-useEffect(() => {
-  console.log("mainEmp ha cambiado:", mainEmp);  // Esto se ejecutará cuando `responseAPI` cambie
-}, [mainEmp]);
+  useEffect(() => {
+    console.log("mainEmp ha cambiado:", mainEmp);  // Esto se ejecutará cuando `responseAPI` cambie
+  }, [mainEmp]);
 
   return (
     <div style={{ height: 400, width: "75%", margin: "0 auto", display: "block" }}>
-      <br/>
+      <br />
       <Typography variant="h5" gutterBottom>
         Empaques
-       {/* Contenedor para los botones */}
-       <Stack direction="row" spacing={2} justifyContent="flex-end" marginBottom={2}>
-       <Button variant="contained" color="primary" onClick={() => handleOpenDialog("create")}>
-          Agregar
-        </Button>
-        <Button variant="contained" color="warning" onClick={() => handleOpenDialog("update")}>
-          Editar
-        </Button>
-        <Button variant="contained" color="error" onClick={() => handleOpenDialog("delete")}>
-          Eliminar
-        </Button>
-      </Stack>
-      {/* {Tabla} */}
+        {/* Contenedor para los botones */}
+        <Stack direction="row" spacing={2} justifyContent="flex-end" marginBottom={2}>
+          <Button variant="contained" color="primary" onClick={() => handleOpenDialog("create")}>
+            Agregar
+          </Button>
+          <Button variant="contained" color="warning" onClick={() => handleOpenDialog("update")}>
+            Editar
+          </Button>
+          <Button variant="contained" color="error" onClick={() => handleOpenDialog("delete")}>
+            Eliminar
+          </Button>
+        </Stack>
+        {/* {Tabla} */}
       </Typography>
       <DataGrid rows={mainEmp} columns={columns} getRowId={(row) => row.idTypeStock} />
-        {/* Dialog Dinámico */}
+      {/* Dialog Dinámico */}
       <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
         <DialogTitle>
           {activeForm === "create" && "Agregar Nuevo Empaque"}

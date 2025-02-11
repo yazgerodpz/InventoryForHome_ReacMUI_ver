@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import { Typography, Button, Stack, Dialog, DialogTitle, DialogContent, DialogActions  } from "@mui/material";
+import { Typography, Button, Stack, Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
 import apiServices from "../Services/apiServices";
 import FormPrioC from '../Componentes/FormPrioC';
 import FormPrioU from '../Componentes/FormPrioU';
@@ -71,17 +71,17 @@ const ReglaPrio: React.FC = () => {
   useEffect(() => {
     console.log("responseAPI ha cambiado:", responseAPI);  // Esto se ejecutará cuando `responseAPI` cambie
   }, [responseAPI]);
-  
+
   useEffect(() => {
     console.log("mainPrio ha cambiado:", mainPrio);  // Esto se ejecutará cuando `responseAPI` cambie
   }, [mainPrio]);
 
   return (
     <div style={{ height: 400, width: "75%", margin: "0 auto", display: "block" }}>
-      <br/>
+      <br />
       <Typography variant="h5" gutterBottom>
         Reglas de prioridad
-       {/* Contenedor para los botones */}
+        {/* Contenedor para los botones */}
         <Stack direction="row" spacing={2} justifyContent="flex-end" marginBottom={2}>
           <Button variant="contained" color="primary" onClick={() => handleOpenDialog("create")}>
             Agregar
@@ -95,8 +95,8 @@ const ReglaPrio: React.FC = () => {
         </Stack>
         {/* {Tabla} */}
       </Typography>
-        <DataGrid rows={mainPrio} columns={columns}  getRowId={(row) => row.idTypePrioritary} />
-           {/* Dialog Dinámico */}
+      <DataGrid rows={mainPrio} columns={columns} getRowId={(row) => row.idTypePrioritary} />
+      {/* Dialog Dinámico */}
       <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
         <DialogTitle>
           {activeForm === "create" && "Agregar Nueva Reglad de Prioridad"}

@@ -1,6 +1,6 @@
 "use client";
 import { DataGrid, GridColDef, } from "@mui/x-data-grid";
-import { Typography,  Button, Stack, Dialog, DialogTitle, DialogContent, DialogActions  } from "@mui/material";
+import { Typography, Button, Stack, Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
 import apiServices from "../Services/apiServices";
 import React, { useState, useEffect } from 'react';
 import FormInvC from "../Componentes/FormInvC";
@@ -90,33 +90,33 @@ const Inventario: React.FC = () => {
   useEffect(() => {
     console.log("responseAPI ha cambiado:", responseAPI);  // Esto se ejecutará cuando `responseAPI` cambie
   }, [responseAPI]);
-  
+
   useEffect(() => {
     console.log("dataInventario ha cambiado:", dataInventario);  // Esto se ejecutará cuando `responseAPI` cambie
   }, [dataInventario]);
 
   return (
     <div style={{ height: 400, width: "75%", margin: "0 auto", display: "block" }}>
-      <br/>
+      <br />
       <Typography variant="h5" gutterBottom>
         Inventario
-          {/* Contenedor para los botones */}
-       <Stack direction="row" spacing={2} justifyContent="flex-end" marginBottom={2}>
-       <Button variant="contained" color="primary" onClick={() => handleOpenDialog("create")}>
-          Agregar
-        </Button>
-        <Button variant="contained" color="warning" onClick={() => handleOpenDialog("update")}>
-          Editar
-        </Button>
-        <Button variant="contained" color="error" onClick={() => handleOpenDialog("delete")}>
-          Eliminar
-        </Button>
-      </Stack>
+        {/* Contenedor para los botones */}
+        <Stack direction="row" spacing={2} justifyContent="flex-end" marginBottom={2}>
+          <Button variant="contained" color="primary" onClick={() => handleOpenDialog("create")}>
+            Agregar
+          </Button>
+          <Button variant="contained" color="warning" onClick={() => handleOpenDialog("update")}>
+            Editar
+          </Button>
+          <Button variant="contained" color="error" onClick={() => handleOpenDialog("delete")}>
+            Eliminar
+          </Button>
+        </Stack>
         {/* {Tabla} */}
       </Typography>
-        <DataGrid
-          rows={dataInventario} columns={columns} getRowId={(row) => row.idItem} />
-           {/* Dialog Dinámico */}
+      <DataGrid
+        rows={dataInventario} columns={columns} getRowId={(row) => row.idItem} />
+      {/* Dialog Dinámico */}
       <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
         <DialogTitle>
           {activeForm === "create" && "Agregar Nuevo Artículo"}
