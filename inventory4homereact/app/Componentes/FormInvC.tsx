@@ -3,8 +3,9 @@ import React, { useState } from 'react';
 import { Typography, TextField, Button, Switch, Select, MenuItem, FormControl, InputLabel, FormControlLabel } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Cancel';
+import apiServices from '../Services/apiServices';
 
-interface Item {
+interface formI {
     itemName: string;
     stock: number;
     typePrioritaryName: string;
@@ -19,7 +20,7 @@ const priorityOptions = ['Alta', 'Media', 'Baja'];
 const stockTypeOptions = ['Caja', 'Bolsa', 'Palet'];
 
 const FormInvC: React.FC = () => {
-    const [formData, setFormData] = useState<Item>({
+    const [formData, setFormData] = useState<formI>({
         itemName: '',
         stock: 0,
         typePrioritaryName: '',

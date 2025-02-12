@@ -47,8 +47,6 @@ const FormPrioC: React.FC = () => {
         data: formP;
       }>("Prioridades/CrearPrios/nuevoReglaPrio", formData);
       console.log('Regla de prioridad creada:', response);
-      // alert('Regla de prioridad creada correctamente');
-      // handleCancel(); // Restablecer el formulario
       if (response.success) {
         alert("regla de prioridad creada exitosamente");
         // se reinicia el formulario
