@@ -4,6 +4,13 @@ import React, { useState } from 'react';
 import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Cancel';
 import apiServices from "../Services/apiServices";
+import Alert from '@mui/material/Alert';
+import Snackbar from '@mui/material/Snackbar';
+
+// Definir las interfaces
+interface FormProps {
+  onClose: () => void;
+}
 
 interface formP {
   idTypePrioritary: number
@@ -12,7 +19,7 @@ interface formP {
   active: boolean;
 }
 
-const FormPrioC: React.FC = () => {
+const FormPrioC: React.FC<FormProps> = ({ onClose }) => {
 
   const [formData, setFormData] = useState<formP>({
     idTypePrioritary: 0,
@@ -20,6 +27,13 @@ const FormPrioC: React.FC = () => {
     _Description: "",
     active: true, // Valor predeterminado para el campo Active
   });
+
+  const [alertMessage, setAlertMessage] = useState<string | null>(null);
+  const [alertSeverity, setAlertSeverity] = useState<'success' | 'error' | 'warning' | 'info'>('success');
+  const [openAlert, setOpenAlert] = useState(false);
+  const handleCloseAlert = () => {
+    setOpenAlert(false);
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -48,15 +62,25 @@ const FormPrioC: React.FC = () => {
       }>("Prioridades/CrearPrios/nuevoReglaPrio", formData);
       console.log('Regla de prioridad creada:', response);
       if (response.success) {
-        alert("regla de prioridad creada exitosamente");
+        //Alerta
+        setAlertMessage("Nuevo empaque creado exitosamente");
+        setAlertSeverity("success");
+        setOpenAlert(true);
         // se reinicia el formulario
         setFormData({ idTypePrioritary: 0, typePrioritaryName: "", _Description: "", active: true });
+        setTimeout(() => {
+          onClose(); // Cerrar formulario después de 7 segundos
+        }, 1300);
       } else {
-        alert("Error al crear la regla");
+        setAlertMessage("Error al crear el empaque");
+        setAlertSeverity("error");
+        setOpenAlert(true);
       }
     } catch (error) {
       console.error("Error al enviar datos:", error);
-      alert('Error al crear la regla de prioridad. Revisa la consola para más detalles.');
+      setAlertMessage("Error al crear el nuevo empaque. Revisa la consola para más detalles.");
+      setAlertSeverity("error");
+      setOpenAlert(true);
     }
   };
 
@@ -69,6 +93,7 @@ const FormPrioC: React.FC = () => {
       active: true,
     });
     // Aquí puedes agregar la lógica para cerrar el formulario o hacer alguna otra acción
+    onClose(); // Cerrar el diálogo
   };
 
   return (
@@ -102,18 +127,18 @@ const FormPrioC: React.FC = () => {
           fullWidth // Para que ocupe todo el ancho disponible
           style={{ marginTop: '10px' }}
         />
-        </div>
-        <FormControlLabel 
+      </div>
+      <FormControlLabel
         control={
-            <Switch
-              id="active"
-              name="active"
-              checked={formData.active}
-              onChange={handleCheckboxChange} />
-          }
-          labelPlacement="start"
-          label="Activo" />
-      
+          <Switch
+            id="active"
+            name="active"
+            checked={formData.active}
+            onChange={handleCheckboxChange} />
+        }
+        labelPlacement="start"
+        label="Activo" />
+
       <div>
         <Button color="success" type="submit" variant="contained" startIcon={<SaveIcon />} className="button-spacing">
           Guardar
@@ -121,6 +146,11 @@ const FormPrioC: React.FC = () => {
         <Button color="error" type="button" onClick={handleCancel} variant="contained" startIcon={<CancelIcon />}>
           Cancelar
         </Button>
+        <Snackbar open={openAlert} autoHideDuration={11000} onClose={handleCloseAlert}>
+          <Alert onClose={handleCloseAlert} severity={alertSeverity} sx={{ width: '100%' }}>
+            {alertMessage}
+          </Alert>
+        </Snackbar>
       </div>
     </form>
   );

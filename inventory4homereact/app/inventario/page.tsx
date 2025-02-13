@@ -52,6 +52,7 @@ const Inventario: React.FC = () => {
   const handleCloseDialog = () => {
     setOpenDialog(false);
     setActiveForm(null);
+    getInventario();
   };
 
   const columns: GridColDef[] = [

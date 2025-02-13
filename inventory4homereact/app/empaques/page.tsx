@@ -1,6 +1,6 @@
 "use client";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import { Typography, Button, Stack, Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
+import { Typography, Button, Stack, Dialog, DialogTitle, DialogContent } from "@mui/material";
 import { useEffect, useState } from "react";
 import apiServices from "../Services/apiServices";
 import FormEmpC from "../Componentes/FormEmpC";
@@ -58,6 +58,7 @@ const Empaques: React.FC = () => {
   const handleCloseDialog = () => {
     setOpenDialog(false);
     setActiveForm(null);
+    getEmpaques();
   };
 
   const columns: GridColDef[] = [
@@ -114,15 +115,10 @@ const Empaques: React.FC = () => {
           {activeForm === "delete" && "Eliminar Empaque"}
         </DialogTitle>
         <DialogContent>
-          {activeForm === "create" && <FormEmpC />}
+          {activeForm === "create" && <FormEmpC onClose={handleCloseDialog} />}
           {activeForm === "update" && <FormEmpU />}
           {activeForm === "delete" && <FormEmpD />}
         </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDialog} color="error" variant="contained">
-            Cerrar
-          </Button>
-        </DialogActions>
       </Dialog>
     </div>
   );

@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import { Typography, Button, Stack, Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
+import { Typography, Button, Stack, Dialog, DialogTitle, DialogContent } from "@mui/material";
 import apiServices from "../Services/apiServices";
 import FormPrioC from '../Componentes/FormPrioC';
 import FormPrioU from '../Componentes/FormPrioU';
@@ -29,7 +29,7 @@ const ReglaPrio: React.FC = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [activeForm, setActiveForm] = useState<"create" | "update" | "delete" | null>(null);
 
-  // // Función para obtener datos de prioridades
+  // Función para obtener datos de prioridades
   const getPrioridades = async () => {
     try {
       const response = await apiServices.getData('Prioridades/ReadPrios') as prioApiMain;
@@ -49,6 +49,7 @@ const ReglaPrio: React.FC = () => {
   const handleCloseDialog = () => {
     setOpenDialog(false);
     setActiveForm(null);
+    getPrioridades();
   };
 
   const columns: GridColDef[] = [
@@ -104,15 +105,10 @@ const ReglaPrio: React.FC = () => {
           {activeForm === "delete" && "Eliminar Regla de Prioridad"}
         </DialogTitle>
         <DialogContent>
-          {activeForm === "create" && <FormPrioC />}
+          {activeForm === "create" && <FormPrioC onClose={handleCloseDialog} />}
           {activeForm === "update" && <FormPrioU />}
           {activeForm === "delete" && <FormPrioD />}
         </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDialog} color="error" variant="contained">
-            Cerrar
-          </Button>
-        </DialogActions>
       </Dialog>
     </div>
   );

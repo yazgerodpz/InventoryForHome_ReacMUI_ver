@@ -5,6 +5,76 @@ import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Cancel';
 import apiServices from '../Services/apiServices';
 
+// Definir las interfaces
+interface empMain {
+  idTypeStock: number;
+  typeStockName: string;
+  active: boolean;
+}
+
+interface empApiMain {
+  success: boolean;
+  data: empMain[];
+}
+
+// Estado para la respuesta de la API
+const [responseAPI1, setResponseAPI1] = useState<empApiMain | null>(null);
+// Estado para almacenar la lista de empaques
+const [mainEmp, setMainEmp] = useState<empMain[]>([]);
+
+
+// Función para traer los datos de la API
+const getEmpaques = async () => {
+  try {
+    // Llamada a la API usando Axios
+    // setResponseAPI (await apiServices.getData("Empaques/ReadEmps"));
+    const prueba = await apiServices.getData("Empaques/ReadEmps") as empApiMain;
+    setResponseAPI1(prueba);
+    setMainEmp(prueba.data);
+    console.log(prueba);
+    console.log(responseAPI1);
+    console.log(mainEmp);
+    
+    //setMainEmp(responseAPI?.data); // Actualizar los datos de la tabla
+  } catch (error) {
+    console.error('ERROR AL TRAER DATOS:', error);
+  }
+};
+
+
+interface prioMain {
+  idTypePrioritary: number;
+  typePrioritaryName: string;
+  _Description: string;
+  active: boolean;
+}
+
+interface prioApiMain { //estructura del objeto que se trae del api
+  success: boolean;
+  data: prioMain[];
+}
+
+  const [responseAPI2, setResponseAPI2] = useState<prioApiMain | null>(null); // Estado para la respuesta de la API
+  const [mainPrio, setMainPrio] = useState<prioMain[]>([]); // Estado para la lista de prioridades
+
+  // Función para obtener datos de prioridades
+    const getPrioridades = async () => {
+      try {
+        const response = await apiServices.getData('Prioridades/ReadPrios') as prioApiMain;
+        setResponseAPI2(response); // Almacena la respuesta completa
+        setMainPrio(response.data); // Extrae y almacena los datos de prioridades
+      } catch (error) {
+        console.error('ERROR AL TRAER DATOS EN', error);
+      }
+    };
+  
+
+
+// Opciones para los selectores
+const priorityOptions = ['Alta', 'Media', 'Baja'];
+const stockTypeOptions = ['Caja', 'Bolsa', 'Palet'];
+
+
 interface formI {
     itemName: string;
     stock: number;
@@ -15,12 +85,8 @@ interface formI {
     active: boolean;
 }
 
-// Opciones para los selectores
-const priorityOptions = ['Alta', 'Media', 'Baja'];
-const stockTypeOptions = ['Caja', 'Bolsa', 'Palet'];
-
 const FormInvC: React.FC = () => {
-    const [formData, setFormData] = useState<formI>({
+  const [formData, setFormData] = useState<formI>({
         itemName: '',
         stock: 0,
         typePrioritaryName: '',
@@ -30,14 +96,13 @@ const FormInvC: React.FC = () => {
         active: true,
     });
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        const { name, value, type, checked } = e.target;
-
-        setFormData((prev) => ({
-            ...prev,
-            [name]: type === 'checkbox' ? checked : name === 'stock' ? Number(value) : value,
-        }));
-    };
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setFormData({
+          ...formData,
+          [name]: value,
+        });
+      };
 
     const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -122,7 +187,7 @@ const FormInvC: React.FC = () => {
                     <MenuItem value="">
                         <em>Seleccione una opción</em>
                     </MenuItem>
-                    {stockTypeOptions.map((option) => (
+                    {getEmpaques.map((option) => (
                         <MenuItem key={option} value={option}>
                             {option}
                         </MenuItem>
