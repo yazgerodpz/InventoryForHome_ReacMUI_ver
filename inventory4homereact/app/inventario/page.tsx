@@ -125,15 +125,10 @@ const Inventario: React.FC = () => {
           {activeForm === "delete" && "Eliminar Artículo"}
         </DialogTitle>
         <DialogContent>
-          {activeForm === "create" && <FormInvC />}
+          {activeForm === "create" && <FormInvC onClose={handleCloseDialog} />}
           {activeForm === "update" && <FormInvU />}
           {activeForm === "delete" && <FormInvD />}
         </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDialog} color="error" variant="contained">
-            Cerrar
-          </Button>
-        </DialogActions>
       </Dialog>
     </div>
   );
