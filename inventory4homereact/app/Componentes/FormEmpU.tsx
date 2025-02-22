@@ -1,29 +1,37 @@
 "use client";
 import { Typography, TextField, Button, FormControlLabel, Switch } from '@mui/material';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Cancel';
 import SearchIcon from '@mui/icons-material/Search';
+import apiServices from '../Services/apiServices';
+import Alert from '@mui/material/Alert';
+import Snackbar from '@mui/material/Snackbar';
 
-interface TypeStock {
+interface empMain {
     idTypeStock: number;
     typeStockName: string;
     active: boolean;
 }
 
+interface empApiMain { //estructura del objeto que se trae del api
+    success: boolean;
+    data: empMain[];
+  }
+
 const FormEmpU = () => {
-    const initialState: TypeStock = {
+    const initialState: empMain = {
         idTypeStock: 0,
         typeStockName: '',
         active: false,
     };
 
-    const [formData, setFormData] = useState<TypeStock>(initialState);
+    const [formData, setFormData] = useState<empMain>(initialState);
     const [searchId, setSearchId] = useState<number | ''>(''); // Para buscar por id
     const [message, setMessage] = useState<string>(''); // Mensajes de estado
 
     // Datos simulados para la búsqueda (esto sería reemplazado por una API)
-    const sampleData: TypeStock[] = [
+    const sampleData: empMain[] = [
         { idTypeStock: 1, typeStockName: 'Almacén A', active: true },
         { idTypeStock: 2, typeStockName: 'Almacén B', active: false },
         { idTypeStock: 3, typeStockName: 'Almacén C', active: true },

@@ -12,7 +12,6 @@ interface FormProps {
     onClose: () => void;
 }
 
-
 // Definir las interfaces
 interface empMain {
     idTypeStock: number;
@@ -41,8 +40,8 @@ interface formI {
     idItem: number;
     itemName: string;
     stock: number;
-    typePrioritaryName: string;
-    typeStockName: string;
+    idTypePrioritary: number;
+    idTypeStock: number;
     purchesDate: Date;
     expirationDate: Date;
     active: boolean;
@@ -56,7 +55,7 @@ const FormInvC: React.FC<FormProps> = ({ onClose }) => {
     const [mainEmp, setMainEmp] = useState<empMain[]>([]);
     const [responseAPI2, setResponseAPI2] = useState<prioApiMain | null>(null); // Estado para la respuesta de la API
     const [mainPrio, setMainPrio] = useState<prioMain[]>([]); // Estado para la lista de prioridades
-    
+
     // Función para traer los datos de la API
     const getEmpaques = async () => {
         try {
@@ -68,13 +67,13 @@ const FormInvC: React.FC<FormProps> = ({ onClose }) => {
             console.log(prueba);
             console.log(responseAPI1);
             console.log(mainEmp);
-            
+
             //setMainEmp(responseAPI?.data); // Actualizar los datos de la tabla
         } catch (error) {
             console.error('ERROR AL TRAER DATOS:', error);
         }
     };
-    
+
     // Función para obtener datos de prioridades
     const getPrioridades = async () => {
         try {
@@ -87,25 +86,25 @@ const FormInvC: React.FC<FormProps> = ({ onClose }) => {
             console.error('ERROR AL TRAER DATOS EN', error);
         }
     };
-    
+
     //Llamar a las funciones dentro de useEffect
     useEffect(() => {
         getEmpaques();
         getPrioridades();
     }, []);
-    
+
     //estructura para el formulario Inv
     const [formData, setFormData] = useState<formI>({
         idItem: 0,
-        itemName: '',
+        itemName: "",
         stock: 0,
-        typePrioritaryName: '',
-        typeStockName: '',
+        idTypePrioritary: 0,
+        idTypeStock: 0,
         purchesDate: new Date(),
         expirationDate: new Date(),
         active: true,
     });
-    
+
     const [alertMessage, setAlertMessage] = useState<string | null>(null);
     const [alertSeverity, setAlertSeverity] = useState<'success' | 'error' | 'warning' | 'info'>('success');
     const [openAlert, setOpenAlert] = useState(false);
@@ -139,6 +138,7 @@ const FormInvC: React.FC<FormProps> = ({ onClose }) => {
                 success: boolean;
                 data: formI;
             }>("Inventario/CrearInv/nuevoItem", formData);
+            console.log(formData)
             console.log('Articulo creado', response);
             if (response.success) {
                 //Alerta
@@ -146,10 +146,10 @@ const FormInvC: React.FC<FormProps> = ({ onClose }) => {
                 setAlertSeverity("success");
                 setOpenAlert(true);
                 // se reinicia el formulario
-                setFormData({
-                    idItem: 0, itemName: "", stock: 0, typePrioritaryName: "", typeStockName: "",
-                    purchesDate: new Date, expirationDate: new Date, active: true
-                });
+                // setFormData({
+                //     idItem: 0, itemName: "", stock: 0, idTypePrioritary,typePrioritaryName: "", typeStockName: "",
+                //     purchesDate: new Date, expirationDate: new Date, active: true
+                // });
                 setTimeout(() => {
                     onClose(); // Cerrar formulario después de 7 segundos
                 }, 1300);
@@ -170,10 +170,10 @@ const FormInvC: React.FC<FormProps> = ({ onClose }) => {
     const handleCancel = () => {
         setFormData({
             idItem: 0,
-            itemName: '',
+            itemName: "",
             stock: 0,
-            typePrioritaryName: '',
-            typeStockName: '',
+            idTypePrioritary:0,
+            idTypeStock:0,
             purchesDate: new Date(),
             expirationDate: new Date(),
             active: true,
@@ -211,16 +211,16 @@ const FormInvC: React.FC<FormProps> = ({ onClose }) => {
                 <Select
                     labelId="typePrioritaryName-label"
                     id="typePrioritaryName"
-                    name="typePrioritaryName"
-                    value={formData.typePrioritaryName}
-                    // onChange={handleChange}
+                    name="idTypePrioritary"
+                    value={formData.idTypePrioritary}
+                    onChange={handleChange}
                     label="Regla de prioridad"
                 >
                     <MenuItem value="">
                         <em>Seleccione una opción</em>
                     </MenuItem>
                     {mainPrio.map((option) => (
-                        <MenuItem key={option.idTypePrioritary} value={option.typePrioritaryName}>
+                        <MenuItem key={option.idTypePrioritary} value={option.idTypePrioritary}>
                             {option.typePrioritaryName}
                         </MenuItem>
                     ))}
@@ -231,16 +231,16 @@ const FormInvC: React.FC<FormProps> = ({ onClose }) => {
                 <Select
                     labelId="typeStockName-label"
                     id="typeStockName"
-                    name="typeStockName"
-                    value={formData.typeStockName}
-                    // onChange={handleChange}
+                    name="idTypeStock"
+                    value={formData.idTypeStock}
+                    onChange={handleChange}
                     label="Tipo de empaque"
-                >
+                    >
                     <MenuItem value="">
                         <em>Seleccione una opción</em>
                     </MenuItem>
                     {mainEmp.map((option) => (
-                        <MenuItem key={option.idTypeStock} value={option.typeStockName}>
+                        <MenuItem key={option.idTypeStock} value={option.idTypeStock}>
                             {option.typeStockName}
                         </MenuItem>
                     ))}
@@ -291,6 +291,11 @@ const FormInvC: React.FC<FormProps> = ({ onClose }) => {
                 <Button color="error" type="button" onClick={handleCancel} variant="contained" startIcon={<CancelIcon />}>
                     Cancelar
                 </Button>
+                <Snackbar open={openAlert} autoHideDuration={11000} onClose={handleCloseAlert}>
+                    <Alert onClose={handleCloseAlert} severity={alertSeverity} sx={{ width: '100%' }}>
+                        {alertMessage}
+                    </Alert>
+                </Snackbar>
             </div>
         </form>
     );
