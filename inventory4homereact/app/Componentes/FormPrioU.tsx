@@ -4,90 +4,126 @@ import React, { useState } from 'react';
 import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Cancel';
 import SearchIcon from '@mui/icons-material/Search';
+import apiServices from '../Services/apiServices';
+import Alert from '@mui/material/Alert';
+import Snackbar from '@mui/material/Snackbar';
 
-interface TypePrioritary {
-  IdTypePrioritary: number; // Nuevo campo añadido
-  TypePrioritaryName: string;
-  Description: string;
-  Active: boolean;
+// Definir las interfaces
+interface FormProps {
+  onClose: () => void;
 }
 
-const FormPrioU: React.FC = () => {
-  const [formData, setFormData] = useState<TypePrioritary>({
-    IdTypePrioritary: 0, // Valor predeterminado
-    TypePrioritaryName: '',
-    Description: '',
-    Active: true, // Valor predeterminado para el campo Active
-  });
+interface prioMain {
+  idTypePrioritary: number;
+  typePrioritaryName: string;
+  _Description: string;
+  active: boolean;
+}
 
-  const [searchId, setSearchId] = useState<number | null>(null);
+interface prioApiMain { //estructura del objeto que se trae del api
+  success: boolean;
+  data: prioMain;
+}
+
+const FormPrioU: React.FC<FormProps> = ({ onClose }) => {
+  const initialState: prioMain = {
+    idTypePrioritary: 0, // Valor predeterminado
+    typePrioritaryName: '',
+    _Description: '',
+    active: true, // Valor predeterminado para el campo Active
+  };
+
+  const [formData, setFormData] = useState<prioMain>(initialState);
+  const [searchId, setSearchId] = useState<number | ''>(''); // Para buscar por id
+  const [alertMessage, setAlertMessage] = useState<string | null>(null);
+  const [alertSeverity, setAlertSeverity] = useState<'success' | 'error' | 'warning' | 'info'>('success');
+  const [openAlert, setOpenAlert] = useState(false);
+  const handleCloseAlert = () => {
+    setOpenAlert(false);
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
+    const { name, value, type, checked } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: type === 'checkbox' ? checked : value,
+    }));
   };
 
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
-      Active: e.target.checked,
+      active: e.target.checked,
     });
   };
 
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchId(Number(e.target.value));
-  };
+  // const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   setSearchId(Number(e.target.value));
+  // };
 
   const handleSearch = async () => {
-    if (searchId !== null) {
-      // Aquí puedes hacer la llamada a la API o a la base de datos para obtener el registro por Id
-      // Por ejemplo, simulemos con un objeto:
-      if (searchId === 1) { // Simulamos que el ID 1 existe
-        const dataFromApi = {
-          IdTypePrioritary: 1,
-          TypePrioritaryName: 'Alta',
-          Description: 'Prioridad alta',
-          Active: true,
-        };
-        setFormData(dataFromApi);
-      } else if (searchId === 2) { // Simulamos que el ID 2 existe
-        const dataFromApi = {
-          IdTypePrioritary: 2,
-          TypePrioritaryName: 'Baja',
-          Description: 'Prioridad baja',
-          Active: false,
-        };
-        setFormData(dataFromApi);
+    if (searchId === '') {
+      setAlertMessage('Por favor, ingresa un ID.');
+      setOpenAlert(true);
+      return;
+    }
+    try {
+      const response: prioApiMain = await apiServices.getData(`Prioridades/ReadPriosById/${searchId}`);
+
+      if (response.success && response.data) {
+        setFormData(response.data);
+        setAlertMessage("hola");
+        setOpenAlert(true);
       } else {
-        // Alerta si no se encuentra el ID
-        setFormData({
-          IdTypePrioritary: 0,
-          TypePrioritaryName: '',
-          Description: '',
-          Active: true,
-        });
-        alert('ID no encontrado');
+        setAlertMessage("ID no encontrado.");
+        setFormData(initialState);
+        setOpenAlert(true);
       }
+    } catch (error) {
+      console.error("Error en la búsqueda:", error);
+      setAlertMessage("Ocurrió un error al buscar la regla.");
+      setFormData(initialState);
+      setOpenAlert(true);
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log('Form submitted:', formData);
     // Aquí puedes agregar la lógica para enviar los datos al servidor o hacer alguna otra acción
+    try {
+      const response = await apiServices.postData<{
+        success: boolean;
+        data: prioMain;
+      }>("Prioridades/EditPrios/ActReglaPrio", formData);
+      console.log('nueva regla de prioridad creada:', response);
+      if (response.success) {
+        //Alerta
+        setAlertMessage("Regla de prioridad actualizada exitosamente");
+        setAlertSeverity("success");
+        setOpenAlert(true);
+        // se reinicia el formulario
+        setFormData({ idTypePrioritary: 0, typePrioritaryName: "", _Description: "", active: true });
+        setTimeout(() => {
+          onClose(); // Cerrar formulario después de 7 segundos
+        }, 1300);
+      } else {
+        setAlertMessage("Error al actualizar la regla de prioridad");
+        setAlertSeverity("error");
+        setOpenAlert(true);
+      }
+    } catch (error) {
+      console.error("Error al enviar datos:", error);
+      setAlertMessage("Error al actualizar la regla de prioridad. Revisa la consola para más detalles.");
+      setAlertSeverity("error");
+      setOpenAlert(true);
+    }
   };
 
   const handleCancel = () => {
-    setFormData({
-      IdTypePrioritary: 0,
-      TypePrioritaryName: '',
-      Description: '',
-      Active: true,
-    });
-    setSearchId(null);
+    setFormData(initialState); // Resetear los campos del formulario
+    onClose(); // Cerrar el diálogo
   };
 
   return (
@@ -96,33 +132,28 @@ const FormPrioU: React.FC = () => {
         Formulario actualizar reglas de prioridad
       </Typography>
       <div>
-        {/* <label htmlFor="searchId">Buscar por ID:</label>
-        <input
-          type="number"
-          id="searchId"
-          value={searchId ?? ''}
-          onChange={handleSearchChange}
-        /> */}
         <TextField
           id="searchId"
           label="Buscar por ID"
           type="number"
-          value={searchId ?? ''}
-          onChange={handleSearchChange}
-          InputLabelProps={{
-            shrink: true,
+          value={searchId || ""}
+          onChange={(e) => setSearchId(e.target.value ? parseInt(e.target.value) : "")}
+          slotProps={{
+            inputLabel: {
+              shrink: true,
+            },
           }}
-          variant="outlined"
+        // variant="outlined"
         />
         <Button type="button" onClick={handleSearch} variant="contained" startIcon={<SearchIcon />}>Buscar</Button>
       </div>
 
       <div>
         <TextField
-          id="TypePrioritaryName"
+          id="typePrioritaryName"
           label="Nueva regla"
-          name="TypePrioritaryName"
-          value={formData.TypePrioritaryName}
+          name="typePrioritaryName"
+          value={formData.typePrioritaryName}
           onChange={handleChange}
           variant="outlined"
           required
@@ -131,10 +162,10 @@ const FormPrioU: React.FC = () => {
       </div>
       <div>
         <TextField
-          id="Description"
+          id="_Description"
           label="Descripción"
-          name="Description"
-          value={formData.Description}
+          name="_Description"
+          value={formData._Description}
           onChange={handleChange}
           variant="outlined"
           required
@@ -148,9 +179,9 @@ const FormPrioU: React.FC = () => {
         <FormControlLabel control=
           {
             <Switch
-              id="Active"
-              name="Active"
-              checked={formData.Active}
+              id="active"
+              name="active"
+              checked={formData.active}
               onChange={handleCheckboxChange} />
           }
           labelPlacement="start"
@@ -163,6 +194,11 @@ const FormPrioU: React.FC = () => {
         <Button color="error" type="button" onClick={handleCancel} variant="contained" startIcon={<CancelIcon />}>
           Cancelar
         </Button>
+        <Snackbar open={openAlert} autoHideDuration={11000} onClose={handleCloseAlert}>
+          <Alert onClose={handleCloseAlert} severity={alertSeverity} sx={{ width: '100%' }}>
+            {alertMessage}
+          </Alert>
+        </Snackbar>
       </div>
     </form>
   );

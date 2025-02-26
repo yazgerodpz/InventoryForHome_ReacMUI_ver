@@ -106,7 +106,7 @@ const ReglaPrio: React.FC = () => {
         </DialogTitle>
         <DialogContent>
           {activeForm === "create" && <FormPrioC onClose={handleCloseDialog} />}
-          {activeForm === "update" && <FormPrioU />}
+          {activeForm === "update" && <FormPrioU onClose={handleCloseDialog} />}
           {activeForm === "delete" && <FormPrioD />}
         </DialogContent>
       </Dialog>
