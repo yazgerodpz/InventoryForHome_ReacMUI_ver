@@ -8,6 +8,11 @@ import apiServices from '../Services/apiServices';
 import Alert from '@mui/material/Alert';
 import Snackbar from '@mui/material/Snackbar';
 
+// Definir las interfaces
+interface FormProps {
+    onClose: () => void;
+}
+
 interface empMain {
     idTypeStock: number;
     typeStockName: string;
@@ -16,26 +21,32 @@ interface empMain {
 
 interface empApiMain { //estructura del objeto que se trae del api
     success: boolean;
-    data: empMain[];
+    data: empMain;
   }
 
-const FormEmpU = () => {
+const FormEmpU:  React.FC<FormProps> = ({ onClose }) => {
     const initialState: empMain = {
         idTypeStock: 0,
         typeStockName: '',
-        active: false,
+        active: true,
     };
 
     const [formData, setFormData] = useState<empMain>(initialState);
     const [searchId, setSearchId] = useState<number | ''>(''); // Para buscar por id
     const [message, setMessage] = useState<string>(''); // Mensajes de estado
+    const [alertMessage, setAlertMessage] = useState<string | null>(null);
+        const [alertSeverity, setAlertSeverity] = useState<'success' | 'error' | 'warning' | 'info'>('success');
+        const [openAlert, setOpenAlert] = useState(false);
+        const handleCloseAlert = () => {
+            setOpenAlert(false);
+        };
 
     // Datos simulados para la búsqueda (esto sería reemplazado por una API)
-    const sampleData: empMain[] = [
-        { idTypeStock: 1, typeStockName: 'Almacén A', active: true },
-        { idTypeStock: 2, typeStockName: 'Almacén B', active: false },
-        { idTypeStock: 3, typeStockName: 'Almacén C', active: true },
-    ];
+    // const sampleData: empMain[] = [
+    //     { idTypeStock: 1, typeStockName: 'Almacén A', active: true },
+    //     { idTypeStock: 2, typeStockName: 'Almacén B', active: false },
+    //     { idTypeStock: 3, typeStockName: 'Almacén C', active: true },
+    // ];
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value, type, checked } = e.target;
@@ -45,32 +56,77 @@ const FormEmpU = () => {
         }));
     };
 
-    const handleSearch = () => {
+    const handleSearch = async () => {
         if (searchId === '') {
-            setMessage('Por favor, ingresa un ID.');
+            setAlertMessage('Por favor, ingresa un ID.');
             return;
         }
+        try {
+            const response: empApiMain = await apiServices.getData(`Empaques/ReadEmpById/${searchId}`);
 
-        // Simulando la búsqueda del objeto por ID
-        const found = sampleData.find((item) => item.idTypeStock === searchId);
-
-        if (found) {
-            setFormData(found);
-            setMessage('');
-        } else {
-            setMessage('ID no encontrado.');
+            if (response.success && response.data) {
+                setFormData(response.data);
+                setAlertMessage("hola");
+            } else {
+                setAlertMessage("ID no encontrado.");
+                setFormData(initialState);
+            }
+        } catch (error) {
+            console.error("Error en la búsqueda:", error);
+            setAlertMessage("Ocurrió un error al buscar el empaque.");
+            setFormData(initialState);
         }
     };
+        
 
-    const handleSubmit = (e: React.FormEvent) => {
+        // Simulando la búsqueda del objeto por ID
+    //     const found = sampleData.find((item) => item.idTypeStock === searchId);
+
+    //     if (found) {
+    //         setFormData(found);
+    //         setMessage('');
+    //     } else {
+    //         setMessage('ID no encontrado.');
+    //     }
+    // };
+
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         // Aquí puedes hacer la lógica para manejar el envío del formulario
         console.log('Formulario enviado:', formData);
-    };
+    try {
+                const response = await apiServices.postData<{
+                    success: boolean;
+                    data: empMain;
+                }>("Empaques/EditEmp/nuevoItem", formData);
+                console.log('nuevo empaque creado:', response);
+                if (response.success) {
+                    //Alerta
+                    setAlertMessage("Empaque actualizado exitosamente");
+                    setAlertSeverity("success");
+                    setOpenAlert(true);
+                    // se reinicia el formulario
+                    setFormData({ idTypeStock: 0, typeStockName: "", active: true });
+                    setTimeout(() => {
+                        onClose(); // Cerrar formulario después de 7 segundos
+                    }, 1300);
+                } else {
+                    setAlertMessage("Error al actualizar el empaque");
+                    setAlertSeverity("error");
+                    setOpenAlert(true);
+                }
+            } catch (error) {
+                console.error("Error al enviar datos:", error);
+                setAlertMessage("Error al actualizar empaque. Revisa la consola para más detalles.");
+                setAlertSeverity("error");
+                setOpenAlert(true);
+            }
+        };
 
     const handleCancel = () => {
         setFormData(initialState); // Resetear los campos del formulario
         setMessage('');
+        onClose(); // Cerrar el diálogo
     };
 
     return (
@@ -91,8 +147,8 @@ const FormEmpU = () => {
                     id="searchId"
                     label="Buscar por ID"
                     type="number"
-                    value={searchId ?? ''}
-                    onChange={(e) => setSearchId(Number(e.target.value))}
+                    value={searchId || ""}
+                    onChange={(e) => setSearchId(e.target.value ? parseInt(e.target.value) : "")}
                     slotProps={{
                         inputLabel: {
                         shrink: true,

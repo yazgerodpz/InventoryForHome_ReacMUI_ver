@@ -116,7 +116,7 @@ const Empaques: React.FC = () => {
         </DialogTitle>
         <DialogContent>
           {activeForm === "create" && <FormEmpC onClose={handleCloseDialog} />}
-          {activeForm === "update" && <FormEmpU />}
+          {activeForm === "update" && <FormEmpU onClose={handleCloseDialog}/>}
           {activeForm === "delete" && <FormEmpD />}
         </DialogContent>
       </Dialog>
