@@ -1,65 +1,149 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Typography, TextField, Button, FormControlLabel, Switch, MenuItem, Select, InputLabel, FormControl, } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Cancel';
 import SearchIcon from '@mui/icons-material/Search';
+import apiServices from '../Services/apiServices';
+import Alert from '@mui/material/Alert';
+import Snackbar from '@mui/material/Snackbar';
 
-interface Item {
+// Definir las interfaces
+interface FormProps {
+    onClose: () => void;
+}
+
+interface empMain {
+    idTypeStock: number;
+    typeStockName: string;
+    active: boolean;
+}
+
+interface empApiMain {
+    success: boolean;
+    data: empMain[];
+}
+
+interface prioMain {
+    idTypePrioritary: number;
+    typePrioritaryName: string;
+    _Description: string;
+    active: boolean;
+}
+
+interface prioApiMain { //estructura del objeto que se trae del api
+    success: boolean;
+    data: prioMain[];
+}
+
+interface invMain {
+    idItem: number;
     itemName: string;
     stock: number;
-    typePrioritaryName: string;
-    typeStockName: string;
+    idTypePrioritary: number;
+    idTypeStock: number;
     purchesDate: Date;
     expirationDate: Date;
     active: boolean;
 }
 
-const priorityOptions = ['Alta', 'Media', 'Baja'];
-const stockTypeOptions = ['Caja', 'Bolsa', 'Palet'];
+interface invApiMain { //estructura del objeto que se trae del api
+    success: boolean;
+    data: invMain;
+}
 
-const FormInvU: React.FC = () => {
-    const [formData, setFormData] = useState<Item>({
-        itemName: '',
+const FormInvU: React.FC<FormProps> = ({ onClose }) => {
+
+    // Estado para la respuesta de la API
+    const [responseAPI1, setResponseAPI1] = useState<empApiMain | null>(null);
+    // Estado para almacenar la lista de empaques
+    const [mainEmp, setMainEmp] = useState<empMain[]>([]);
+    const [responseAPI2, setResponseAPI2] = useState<prioApiMain | null>(null); // Estado para la respuesta de la API
+    const [mainPrio, setMainPrio] = useState<prioMain[]>([]); // Estado para la lista de prioridades
+
+    // Función para traer los datos de la API
+    const getEmpaques = async () => {
+        try {
+            // Llamada a la API usando Axios
+            // setResponseAPI (await apiServices.getData("Empaques/ReadEmps"));
+            const prueba = await apiServices.getData("Empaques/ReadEmps") as empApiMain;
+            setResponseAPI1(prueba);
+            setMainEmp(prueba.data);
+            console.log(prueba);
+            console.log(responseAPI1);
+            console.log(mainEmp);
+
+            //setMainEmp(responseAPI?.data); // Actualizar los datos de la tabla
+        } catch (error) {
+            console.error('ERROR AL TRAER DATOS:', error);
+        }
+    };
+
+    // Función para obtener datos de prioridades
+    const getPrioridades = async () => {
+        try {
+            const responsePrio = await apiServices.getData('Prioridades/ReadPrios') as prioApiMain;
+            setResponseAPI2(responsePrio); // Almacena la respuesta completa
+            setMainPrio(responsePrio.data); // Extrae y almacena los datos de prioridades
+            console.log(responseAPI2);
+            console.log(mainPrio);
+        } catch (error) {
+            console.error('ERROR AL TRAER DATOS EN', error);
+        }
+    };
+
+    //Llamar a las funciones dentro de useEffect
+    useEffect(() => {
+        getEmpaques();
+        getPrioridades();
+    }, []);
+
+    const initialState: invMain = {
+        idItem: 0,
+        itemName: "",
         stock: 0,
-        typePrioritaryName: '',
-        typeStockName: '',
+        idTypePrioritary: 0,
+        idTypeStock: 0,
         purchesDate: new Date(),
         expirationDate: new Date(),
         active: true,
-    });
-
-    const [searchId, setSearchId] = useState<number | ''>(''); // Estado para el ID de búsqueda
-
-    // Simulación de datos para la búsqueda
-    const fakeData: Record<number, Item> = {
-        1: {
-            itemName: 'Item 1',
-            stock: 10,
-            typePrioritaryName: 'High',
-            typeStockName: 'Box',
-            purchesDate: new Date('2024-01-01'),
-            expirationDate: new Date('2024-12-31'),
-            active: true,
-        },
-        2: {
-            itemName: 'Item 2',
-            stock: 5,
-            typePrioritaryName: 'Medium',
-            typeStockName: 'Bag',
-            purchesDate: new Date('2024-02-01'),
-            expirationDate: new Date('2024-11-30'),
-            active: false,
-        },
     };
 
-    const handleSearch = () => {
-        if (typeof searchId === 'number' && fakeData[searchId]) {
-            setFormData(fakeData[searchId]); // Rellena el formulario con los datos encontrados
-        } else {
-            alert('ID not found');
+    const [formData, setFormData] = useState<invMain>(initialState);
+    const [searchId, setSearchId] = useState<number | ''>(''); // Para buscar por id
+    const [alertMessage, setAlertMessage] = useState<string | null>(null);
+    const [alertSeverity, setAlertSeverity] = useState<'success' | 'error' | 'warning' | 'info'>('success');
+    const [openAlert, setOpenAlert] = useState(false);
+    const handleCloseAlert = () => {
+        setOpenAlert(false);
+    };
+
+    const handleSearch = async () => {
+        if (searchId === '') {
+            setAlertMessage('Por favor, ingresa un ID.');
+            setOpenAlert(true);
+            return;
+        }
+        try {
+            const response: invApiMain = await apiServices.getData(`Inventario/ReadInvById/${searchId}`);
+
+            if (response.success && response.data) {
+                setFormData(response.data);
+                setAlertMessage("hola");
+                setOpenAlert(true);
+            } else {
+                setAlertMessage("ID no encontrado.");
+                setFormData(initialState);
+                setOpenAlert(true);
+            }
+        } catch (error) {
+            console.error("Error en la búsqueda:", error);
+            setAlertMessage("Ocurrió un error al buscar la regla.");
+            setFormData(initialState);
+            setOpenAlert(true);
         }
     };
+
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value, type, checked } = e.target;
@@ -67,6 +151,24 @@ const FormInvU: React.FC = () => {
         setFormData((prev) => ({
             ...prev,
             [name]: type === 'checkbox' ? checked : name === 'stock' ? Number(value) : value,
+        }));
+    };
+
+    const handleChangeStock = (e: React.ChangeEvent<{ value: unknown }>) => {
+        const { value } = e.target;
+
+        setFormData((prev) => ({
+            ...prev,
+            idTypeStock: value as number, // Aseguramos que el valor es un número
+        }));
+    };
+
+    const handleChangePriority = (e: React.ChangeEvent<{ value: unknown }>) => {
+        const { value } = e.target;
+
+        setFormData((prev) => ({
+            ...prev,
+            idTypePrioritary: value as number, // Aseguramos que el valor es un número
         }));
     };
 
@@ -79,46 +181,90 @@ const FormInvU: React.FC = () => {
         }));
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        console.log('Form data submitted:', formData);
+        console.log('Form submitted:', formData);
+        // Aquí puedes agregar la lógica para enviar los datos al servidor o hacer alguna otra acción
+        try {
+            const response = await apiServices.postData<{
+                success: boolean;
+                data: invMain;
+            }>("Prioridades/EditPrios/ActReglaPrio", formData);
+            console.log('nueva regla de prioridad creada:', response);
+            if (response.success) {
+                //Alerta
+                setAlertMessage("Regla de prioridad actualizada exitosamente");
+                setAlertSeverity("success");
+                setOpenAlert(true);
+                // se reinicia el formulario
+                setFormData({
+
+                    idItem: 0,
+                    itemName: "",
+                    stock: 0,
+                    idTypePrioritary: 0,
+                    idTypeStock: 0,
+                    purchesDate: new Date,
+                    expirationDate: new Date,
+                    active: true
+                });
+
+                setTimeout(() => {
+                    onClose(); // Cerrar formulario después de 7 segundos
+                }, 1300);
+            } else {
+                setAlertMessage("Error al actualizar la regla de prioridad");
+                setAlertSeverity("error");
+                setOpenAlert(true);
+            }
+        } catch (error) {
+            console.error("Error al enviar datos:", error);
+            setAlertMessage("Error al actualizar la regla de prioridad. Revisa la consola para más detalles.");
+            setAlertSeverity("error");
+            setOpenAlert(true);
+        }
     };
 
     const handleCancel = () => {
-        setFormData({
-            itemName: '',
-            stock: 0,
-            typePrioritaryName: '',
-            typeStockName: '',
-            purchesDate: new Date(),
-            expirationDate: new Date(),
-            active: true,
-        });
+        setFormData(initialState); // Resetear los campos del formulario
+        onClose(); // Cerrar el diálogo
     };
 
     return (
         <div>
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-            <Typography variant="h5" gutterBottom>
-                Formulario actualizar artículos
-            </Typography>
-            <div>
-                <TextField
-                    id="searchId"
-                    label="Buscar por ID"
-                    type="number"
-                    value={searchId ?? ''}
-                    onChange={(e) => setSearchId(e.target.value ? Number(e.target.value) : '')}
-                    InputLabelProps={{
-                        shrink: true,
-                    }}
-                    variant="outlined"
-                />
-                <Button type="button" onClick={handleSearch} variant="contained" startIcon={<SearchIcon />}>Buscar</Button>
-            </div>
+                <Typography variant="h5" gutterBottom>
+                    Formulario actualizar artículos
+                </Typography>
+                <div>
+                    <TextField
+                        id="searchId"
+                        label="Buscar por ID"
+                        type="number"
+                        value={searchId || ""}
+                        onChange={(e) => setSearchId(e.target.value ? parseInt(e.target.value) : "")}
+                        slotProps={{
+                            inputLabel: {
+                                shrink: true,
+                            },
+                        }}
+                    // variant="outlined"
+                    />
+                    <Button type="button" onClick={handleSearch} variant="contained" startIcon={<SearchIcon />}>Buscar</Button>
+                </div>
 
                 <div>
                     <TextField
+                        id="itemName"
+                        label="Nombre del artículo"
+                        name="itemName"
+                        value={formData.itemName}
+                        onChange={handleChange}
+                        variant="outlined"
+                        required
+                        style={{ marginTop: '10px' }}
+                    />
+                    {/* <TextField
                         label="Item Name"
                         name="itemName"
                         value={formData.itemName}
@@ -126,7 +272,7 @@ const FormInvU: React.FC = () => {
                         variant="outlined"
                         fullWidth
                         required
-                    />
+                    /> */}
                 </div>
                 <div>
                     <TextField
@@ -141,7 +287,7 @@ const FormInvU: React.FC = () => {
                     />
                 </div>
                 <div>
-                    <FormControl fullWidth>
+                    {/* <FormControl fullWidth>
                         <InputLabel>Regla de Prioridad</InputLabel>
                         <Select
                             name="typePrioritaryName"
@@ -157,10 +303,27 @@ const FormInvU: React.FC = () => {
                                 </MenuItem>
                             ))}
                         </Select>
+                    </FormControl> */}
+                    <FormControl fullWidth>
+                        <InputLabel>Regla de Prioridad</InputLabel>
+                        <Select
+                            name="idTypePrioritary" // El nombre del campo que se actualiza
+                            value={formData.idTypePrioritary} // El valor seleccionado en el campo de prioridad
+                            onChange={handleChangePriority} // Llama a la función handleChangePriority para actualizar el estado
+                        >
+                            <MenuItem value="">
+                                <em>Seleccione una regla de prioridad</em>
+                            </MenuItem>
+                            {mainPrio.map((option) => ( // Aquí `mainPrio` es la lista de opciones de prioridad obtenida
+                                <MenuItem key={option.idTypePrioritary} value={option.idTypePrioritary}>
+                                    {option.typePrioritaryName} {/* Nombre de la prioridad */}
+                                </MenuItem>
+                            ))}
+                        </Select>
                     </FormControl>
                 </div>
                 <div>
-                    <FormControl fullWidth>
+                    {/* <FormControl fullWidth>
                         <InputLabel>Tipo de Empaque</InputLabel>
                         <Select
                             name="typeStockName"
@@ -176,10 +339,28 @@ const FormInvU: React.FC = () => {
                                 </MenuItem>
                             ))}
                         </Select>
+                    </FormControl> */}
+                    <FormControl fullWidth>
+                        <InputLabel>Tipo de Stock</InputLabel>
+                        <Select
+                            name="idTypeStock" // El nombre del campo que se actualiza
+                            value={formData.idTypeStock} // El valor seleccionado en el campo de stock
+                            onChange={handleChangeStock} // Llama a la función handleChangeStock para actualizar el estado
+                        >
+                            <MenuItem value="">
+                                <em>Seleccione un tipo de stock</em>
+                            </MenuItem>
+                            {mainEmp.map((option) => ( // Aquí `mainStock` es la lista de opciones de stock obtenida
+                                <MenuItem key={option.idTypeStock} value={option.idTypeStock}>
+                                    {option.typeStockName} {/* Nombre del tipo de stock */}
+                                </MenuItem>
+                            ))}
+                        </Select>
                     </FormControl>
+
                 </div>
                 <div>
-                    <TextField
+                    {/* <TextField
                         label="Purchase Date"
                         name="purchesDate"
                         type="date"
@@ -187,7 +368,20 @@ const FormInvU: React.FC = () => {
                         onChange={handleDateChange}
                         fullWidth
                         InputLabelProps={{ shrink: true }}
-                    />
+                    /> */}
+                    <TextField
+                                    id="purchesDate"
+                                    label="Fecha de compra"
+                                    type="date"
+                                    name="purchesDate"
+                                    value={formData.purchesDate.toISOString().split('T')[0]}
+                                    onChange={handleDateChange}
+                                    InputLabelProps={{
+                                        shrink: true,
+                                    }}
+                                    variant="outlined"
+                                    required
+                                />
                 </div>
                 <div>
                     <TextField
@@ -233,6 +427,11 @@ const FormInvU: React.FC = () => {
                     >
                         Cancelar
                     </Button>
+                    <Snackbar open={openAlert} autoHideDuration={11000} onClose={handleCloseAlert}>
+                        <Alert onClose={handleCloseAlert} severity={alertSeverity} sx={{ width: '100%' }}>
+                            {alertMessage}
+                        </Alert>
+                    </Snackbar>
                 </div>
             </form>
         </div>

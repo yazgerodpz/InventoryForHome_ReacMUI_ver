@@ -12,7 +12,6 @@ interface FormProps {
     onClose: () => void;
 }
 
-// Definir las interfaces
 interface empMain {
     idTypeStock: number;
     typeStockName: string;

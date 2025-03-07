@@ -126,7 +126,7 @@ const Inventario: React.FC = () => {
         </DialogTitle>
         <DialogContent>
           {activeForm === "create" && <FormInvC onClose={handleCloseDialog} />}
-          {activeForm === "update" && <FormInvU />}
+          {activeForm === "update" && <FormInvU onClose={handleCloseDialog} />}
           {activeForm === "delete" && <FormInvD />}
         </DialogContent>
       </Dialog>
