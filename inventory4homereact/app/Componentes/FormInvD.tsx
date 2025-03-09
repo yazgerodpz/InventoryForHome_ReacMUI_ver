@@ -1,68 +1,201 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Typography, TextField, Button, Box, FormControlLabel, Switch } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import CancelIcon from '@mui/icons-material/Cancel';
 import SearchIcon from '@mui/icons-material/Search';
+import apiServices from '../Services/apiServices';
+import Alert from '@mui/material/Alert';
+import Snackbar from '@mui/material/Snackbar';
 
-interface Item {
+// Definir las interfaces
+interface FormProps {
+    onClose: () => void;
+}
+
+interface empMain {
+    idTypeStock: number;
+    typeStockName: string;
+    active: boolean;
+}
+
+interface empApiMain {
+    success: boolean;
+    data: empMain[];
+}
+
+interface prioMain {
+    idTypePrioritary: number;
+    typePrioritaryName: string;
+    _Description: string;
+    active: boolean;
+}
+
+interface prioApiMain { //estructura del objeto que se trae del api
+    success: boolean;
+    data: prioMain[];
+}
+
+interface invMain {
+    idItem: number;
     itemName: string;
     stock: number;
-    typePrioritaryName: string;
-    typeStockName: string;
+    idTypePrioritary: number;
+    typePrioritaryName?: string;
+    idTypeStock: number;
+    typeStockName?: string;
     purchesDate: Date;
     expirationDate: Date;
     active: boolean;
 }
 
-const FormInvD: React.FC = () => {
-    const [formData, setFormData] = useState<Item | null>(null); // Datos encontrados
-    const [searchId, setSearchId] = useState<number | ''>(''); // ID para la búsqueda
+interface invApiMain { //estructura del objeto que se trae del api
+    success: boolean;
+    data: invMain;
+}
 
-    // Simulación de datos para la búsqueda
-    const fakeData: Record<number, Item> = {
-        1: {
-            itemName: 'Item 1',
-            stock: 10,
-            typePrioritaryName: 'High',
-            typeStockName: 'Box',
-            purchesDate: new Date('2024-01-01'),
-            expirationDate: new Date('2024-12-31'),
-            active: true,
-        },
-        2: {
-            itemName: 'Item 2',
-            stock: 5,
-            typePrioritaryName: 'Medium',
-            typeStockName: 'Bag',
-            purchesDate: new Date('2024-02-01'),
-            expirationDate: new Date('2024-11-30'),
-            active: false,
-        },
-    };
+const FormInvD: React.FC<FormProps> = ({ onClose }) => {
 
-    const handleSearch = () => {
-        if (typeof searchId === 'number' && fakeData[searchId]) {
-            setFormData(fakeData[searchId]); // Muestra los datos encontrados
-        } else {
-            alert('ID not found');
-            setFormData(null); // Limpia si no se encuentra
+    // Estado para la respuesta de la API
+    const [responseAPI1, setResponseAPI1] = useState<empApiMain | null>(null);
+    // Estado para almacenar la lista de empaques
+    const [mainEmp, setMainEmp] = useState<empMain[]>([]);
+    const [responseAPI2, setResponseAPI2] = useState<prioApiMain | null>(null); // Estado para la respuesta de la API
+    const [mainPrio, setMainPrio] = useState<prioMain[]>([]); // Estado para la lista de prioridades
+
+    // Función para traer los datos de la API
+    const getEmpaques = async () => {
+        try {
+            // Llamada a la API usando Axios
+            // setResponseAPI (await apiServices.getData("Empaques/ReadEmps"));
+            const prueba = await apiServices.getData("Empaques/ReadEmps") as empApiMain;
+            setResponseAPI1(prueba);
+            setMainEmp(prueba.data);
+            console.log(prueba);
+            console.log(responseAPI1);
+            console.log(mainEmp);
+
+            //setMainEmp(responseAPI?.data); // Actualizar los datos de la tabla
+        } catch (error) {
+            console.error('ERROR AL TRAER DATOS:', error);
         }
     };
 
-    const handleDelete = () => {
-        if (typeof searchId === 'number' && fakeData[searchId]) {
-            delete fakeData[searchId]; // Simula la eliminación
-            setFormData(null); // Limpia los datos en pantalla
-            alert(`Item with ID ${searchId} deleted successfully.`); // Muestra alerta de confirmación
-        } else {
-            alert('No item found to delete.');
+    // Función para obtener datos de prioridades
+    const getPrioridades = async () => {
+        try {
+            const responsePrio = await apiServices.getData('Prioridades/ReadPrios') as prioApiMain;
+            setResponseAPI2(responsePrio); // Almacena la respuesta completa
+            setMainPrio(responsePrio.data); // Extrae y almacena los datos de prioridades
+            console.log(responseAPI2);
+            console.log(mainPrio);
+        } catch (error) {
+            console.error('ERROR AL TRAER DATOS EN', error);
+        }
+    };
+
+    //Llamar a las funciones dentro de useEffect
+    useEffect(() => {
+        getEmpaques();
+        getPrioridades();
+    }, []);
+
+    const initialState: invMain = {
+        idItem: 0,
+        itemName: "",
+        stock: 0,
+        idTypePrioritary: 0,
+        idTypeStock: 0,
+        purchesDate: new Date(),
+        expirationDate: new Date(),
+        active: true,
+    };
+
+    const [formData, setFormData] = useState<invMain>(initialState);
+    const [searchId, setSearchId] = useState<number | ''>(''); // Para buscar por id
+    const [alertMessage, setAlertMessage] = useState<string | null>(null);
+    const [alertSeverity, setAlertSeverity] = useState<'success' | 'error' | 'warning' | 'info'>('success');
+    const [openAlert, setOpenAlert] = useState(false);
+    const handleCloseAlert = () => {
+        setOpenAlert(false);
+    };
+
+    const handleSearch = async () => {
+        if (searchId === '') {
+            setAlertMessage('Por favor, ingresa un ID.');
+            setOpenAlert(true);
+            return;
+        }
+        try {
+            const response: invApiMain = await apiServices.getData(`Inventario/ReadInvById/${searchId}`);
+
+            if (response.success && response.data) {
+                // Buscar los nombres correspondientes en los catálogos
+                const priority = mainPrio.find(p => p.idTypePrioritary === response.data.idTypePrioritary);
+                const stock = mainEmp.find(s => s.idTypeStock === response.data.idTypeStock);
+
+                // Asignar los valores a formData
+                setFormData({
+                    ...response.data,
+                    purchesDate: new Date(response.data.purchesDate),
+                    expirationDate: new Date(response.data.expirationDate),
+                    typePrioritaryName: priority ? priority.typePrioritaryName : "Desconocido",
+                    typeStockName: stock ? stock.typeStockName : "Desconocido"
+                });
+                setFormData(response.data);
+                setAlertMessage("hola");
+                setOpenAlert(true);
+            } else {
+                setAlertMessage("ID no encontrado.");
+                setFormData(initialState);
+                setOpenAlert(true);
+            }
+        } catch (error) {
+            console.error("Error en la búsqueda:", error);
+            setAlertMessage("Ocurrió un error al buscar la regla.");
+            setFormData(initialState);
+            setOpenAlert(true);
+        }
+    };
+
+    const handleDelete = async () => {
+        if (searchId === '' || typeof searchId !== 'number') {
+            setAlertMessage('Por favor, ingresa un ID válido para eliminar.');
+            setAlertSeverity('warning');
+            setOpenAlert(true);
+            return;
+        }
+
+        try {
+            const response = await apiServices.deleteData<{
+                success: boolean;
+                data: invMain;
+            }>(`Inventario/DeleteArt/${searchId}`);
+
+            if (response.success) {
+                setAlertMessage(`Artículo eliminado correctamente.`);
+                setAlertSeverity('success');
+                setOpenAlert(true);
+                setFormData(initialState); // Limpia los datos en pantalla
+                setTimeout(() => {
+                    onClose(); // Cerrar formulario después de 7 segundos
+                }, 1300);
+            } else {
+                setAlertMessage('No se pudo eliminar el artículo.');
+                setAlertSeverity('error');
+                setOpenAlert(true);
+            }
+        } catch (error) {
+            console.error("Error al eliminar el artículo:", error);
+            setAlertMessage('Ocurrió un error al intentar eliminar el artículo.');
+            setAlertSeverity('error');
+            setOpenAlert(true);
         }
     };
 
     const handleCancel = () => {
-        setFormData(null); // Limpia los datos
-        setSearchId(''); // Limpia el ID de búsqueda
+        setFormData(initialState); // Resetear los campos del formulario
+        onClose(); // Cerrar el diálogo
     };
 
     return (
@@ -84,63 +217,74 @@ const FormInvD: React.FC = () => {
                     id="searchId"
                     label="Buscar por ID"
                     type="number"
-                    value={searchId}
-                    onChange={(e) => setSearchId(e.target.value ? Number(e.target.value) : '')}
-                    InputLabelProps={{
-                        shrink: true, // Mantiene la etiqueta flotando
+                    value={searchId || ""}
+                    onChange={(e) => setSearchId(e.target.value ? parseInt(e.target.value) : "")}
+                    slotProps={{
+                        inputLabel: {
+                            shrink: true,
+                        },
                     }}
                 />
                 <Button type="button" onClick={handleSearch} variant="contained" startIcon={<SearchIcon />}>Buscar</Button>
             </div>
-            <br/>
+            <br />
             {formData && (
                 <div>
                     <h3>Item Details:</h3>
-                    <br/>
+                    <br />
                     <p>
                         <strong>Name:</strong> {formData.itemName}
                     </p>
-                    <br/>
+                    <br />
                     <p>
                         <strong>Stock:</strong> {formData.stock}
                     </p>
-                    <br/>
+                    <br />
                     <p>
                         <strong>Type Prioritary:</strong> {formData.typePrioritaryName}
                     </p>
-                    <br/>
+                    <br />
                     <p>
                         <strong>Type Stock:</strong> {formData.typeStockName}
                     </p>
-                    <br/>
+                    <br />
                     <p>
-                        <strong>Purchase Date:</strong> {formData.purchesDate.toDateString()}
+                        <strong>Purchase Date:</strong> {formData.purchesDate instanceof Date 
+        ? formData.purchesDate.toISOString().split('T')[0] 
+        : "Fecha no válida"}
                     </p>
-                    <br/>
+                    <br />
                     <p>
-                        <strong>Expiration Date:</strong> {formData.expirationDate.toDateString()}
+                        <strong>Expiration Date:</strong> {formData.expirationDate instanceof Date 
+        ? formData.expirationDate.toISOString().split('T')[0] 
+        : "Fecha no válida"}
                     </p>
-                    <br/>
+                    <br />
                     <p>
                         <FormControlLabel
-                        control={
-                            <Switch
-                                id="active"
-                                name="active"
-                                checked={formData.active}
-                                readOnly
-                            />
-                        }
-                        label="Activo"
-                    />
+                            control={
+                                <Switch
+                                    id="active"
+                                    name="active"
+                                    checked={formData.active}
+                                    readOnly
+                                />
+                            }
+                            label="Activo"
+                        />
                     </p>
-                    <br/>
+                    <br />
                     <Button color="secondary" type="button" onClick={handleDelete} variant="contained" startIcon={<DeleteIcon />} className="button-spacing">
                         Delete
                     </Button>
                     <Button color="error" type="button" onClick={handleCancel} variant="contained" startIcon={<CancelIcon />}>
                         Cancelar
                     </Button>
+                    <Snackbar open={openAlert} autoHideDuration={11000} onClose={handleCloseAlert}>
+                        <Alert onClose={handleCloseAlert} severity={alertSeverity} sx={{ width: '100%' }}>
+                            {alertMessage}
+                        </Alert>
+                    </Snackbar>
                 </div>
             )}
         </div>

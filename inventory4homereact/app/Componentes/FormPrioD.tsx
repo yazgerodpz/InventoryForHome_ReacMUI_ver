@@ -4,53 +4,108 @@ import { Typography, TextField, Button, Box, FormControlLabel, Switch } from '@m
 import DeleteIcon from '@mui/icons-material/Delete';
 import CancelIcon from '@mui/icons-material/Cancel';
 import SearchIcon from '@mui/icons-material/Search';
+import apiServices from '../Services/apiServices';
+import Alert from '@mui/material/Alert';
+import Snackbar from '@mui/material/Snackbar';
 
-interface TypePrioritary {
-    IdTypePrioritary: number;
-    TypePrioritaryName: string;
-    Description: string;
+// Definir las interfaces
+interface FormProps {
+    onClose: () => void;
 }
 
-const FormPrioD: React.FC = () => {
-    const [formData, setFormData] = useState<TypePrioritary | null>(null); // Datos encontrados
-    const [searchId, setSearchId] = useState<number | ''>(''); // ID para la búsqueda
+interface prioMain {
+    idTypePrioritary: number;
+    typePrioritaryName: string;
+    _Description: string;
+    active: boolean;
+}
 
-    // Simulación de datos para la búsqueda
-    const fakeData: Record<number, TypePrioritary> = {
-        1: {
-            IdTypePrioritary: 1,
-            TypePrioritaryName: 'High Priority',
-            Description: 'This item has high priority.',
-        },
-        2: {
-            IdTypePrioritary: 2,
-            TypePrioritaryName: 'Medium Priority',
-            Description: 'This item has medium priority.',
-        },
+interface prioApiMain { //estructura del objeto que se trae del api
+    success: boolean;
+    data: prioMain;
+}
+
+const FormPrioD: React.FC<FormProps> = ({ onClose }) => {
+    const initialState: prioMain = {
+        idTypePrioritary: 0, // Valor predeterminado
+        typePrioritaryName: '',
+        _Description: '',
+        active: true, // Valor predeterminado para el campo Active
+    };
+    const [formData, setFormData] = useState<prioMain>(initialState);
+    const [searchId, setSearchId] = useState<number | ''>(''); // Para buscar por id
+    const [alertMessage, setAlertMessage] = useState<string | null>(null);
+    const [alertSeverity, setAlertSeverity] = useState<'success' | 'error' | 'warning' | 'info'>('success');
+    const [openAlert, setOpenAlert] = useState(false);
+    const handleCloseAlert = () => {
+        setOpenAlert(false);
     };
 
-    const handleSearch = () => {
-        if (typeof searchId === 'number' && fakeData[searchId]) {
-            setFormData(fakeData[searchId]); // Muestra los datos encontrados
-        } else {
-            alert('ID not found');
-            setFormData(null); // Limpia si no se encuentra
+    // Funcion de busqueda por id
+    const handleSearch = async () => {
+        if (searchId === '') {
+            setAlertMessage('Por favor, ingresa un ID.');
+            setOpenAlert(true);
+            return;
+        }
+        try {
+            const response: prioApiMain = await apiServices.getData(`Prioridades/ReadPriosById/${searchId}`);
+
+            if (response.success && response.data) {
+                setFormData(response.data);
+                setAlertMessage("hola");
+                setOpenAlert(true);
+            } else {
+                setAlertMessage("ID no encontrado.");
+                setFormData(initialState);
+                setOpenAlert(true);
+            }
+        } catch (error) {
+            console.error("Error en la búsqueda:", error);
+            setAlertMessage("Ocurrió un error al buscar la regla.");
+            setFormData(initialState);
+            setOpenAlert(true);
         }
     };
 
-    const handleDelete = () => {
-        if (typeof searchId === 'number' && fakeData[searchId]) {
-            delete fakeData[searchId]; // Simula la eliminación
-            setFormData(null); // Limpia los datos en pantalla
-            alert(`TypePrioritary with ID ${searchId} deleted successfully.`); // Muestra alerta de confirmación
-        } else {
-            alert('No TypePrioritary found to delete.');
+    const handleDelete = async () => {
+        if (searchId === '' || typeof searchId !== 'number') {
+            setAlertMessage('Por favor, ingresa un ID válido para eliminar.');
+            setAlertSeverity('warning');
+            setOpenAlert(true);
+            return;
+        }
+
+        try {
+            const response = await apiServices.deleteData<{
+                success: boolean;
+                data: prioMain;
+            }>(`Prioridades/DelPriosById/${searchId}`);
+
+            if (response.success) {
+                setAlertMessage(`Regla de prioridad eliminada correctamente.`);
+                setAlertSeverity('success');
+                setOpenAlert(true);
+                setFormData(initialState); // Limpia los datos en pantalla
+                setTimeout(() => {
+                    onClose(); // Cerrar formulario después de 7 segundos
+                }, 1300);
+            } else {
+                setAlertMessage('No se pudo eliminar la regla.');
+                setAlertSeverity('error');
+                setOpenAlert(true);
+            }
+        } catch (error) {
+            console.error("Error al eliminar la regla:", error);
+            setAlertMessage('Ocurrió un error al intentar eliminar la regla.');
+            setAlertSeverity('error');
+            setOpenAlert(true);
         }
     };
 
     const handleCancel = () => {
-        setFormData(null); // Limpia los datos
-        setSearchId(''); // Limpia el ID de búsqueda
+        setFormData(initialState); // Resetear los campos del formulario
+        onClose(); // Cerrar el diálogo
     };
 
     return (
@@ -69,33 +124,54 @@ const FormPrioD: React.FC = () => {
                     id="searchId"
                     label="Buscar por ID"
                     type="number"
-                    value={searchId}
-                    onChange={(e) => setSearchId(e.target.value ? Number(e.target.value) : '')}
-                    InputLabelProps={{
-                        shrink: true, // Mantiene la etiqueta flotando
+                    value={searchId || ""}
+                    onChange={(e) => setSearchId(e.target.value ? parseInt(e.target.value) : "")}
+                    slotProps={{
+                        inputLabel: {
+                            shrink: true,
+                        },
                     }}
                 />
                 <Button type="button" onClick={handleSearch} variant="contained" startIcon={<SearchIcon />}>Buscar</Button>
             </div>
-            <br/>
+            <br />
             {formData && (
                 <div>
                     <h3>TypePrioritary Details:</h3>
-                    <br/>
+                    <br />
                     <p>
-                        <strong>Type Prioritary Name:</strong> {formData.TypePrioritaryName}
+                        <strong>Type Prioritary Name:</strong> {formData.typePrioritaryName}
                     </p>
-                    <br/>
+                    <br />
                     <p>
-                        <strong>Description:</strong> {formData.Description}
+                        <strong>Description:</strong> {formData._Description}
                     </p>
-                    <br/>
+                    <br />
+                    <p>
+                        <FormControlLabel
+                            control={
+                                <Switch
+                                    id="active"
+                                    name="active"
+                                    checked={formData.active}
+                                    readOnly
+                                />
+                            }
+                            label="Activo"
+                        />
+                    </p>
+                    <br />
                     <Button color="secondary" type="button" onClick={handleDelete} variant="contained" startIcon={<DeleteIcon />} className="button-spacing">
                         Delete
                     </Button>
                     <Button color="error" type="button" onClick={handleCancel} variant="contained" startIcon={<CancelIcon />}>
                         Cancelar
                     </Button>
+                    <Snackbar open={openAlert} autoHideDuration={11000} onClose={handleCloseAlert}>
+                        <Alert onClose={handleCloseAlert} severity={alertSeverity} sx={{ width: '100%' }}>
+                            {alertMessage}
+                        </Alert>
+                    </Snackbar>
                 </div>
             )}
         </div>
