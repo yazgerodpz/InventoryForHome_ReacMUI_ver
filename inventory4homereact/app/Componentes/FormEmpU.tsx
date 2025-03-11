@@ -59,7 +59,7 @@ const FormEmpU: React.FC<FormProps> = ({ onClose }) => {
 
             if (response.success && response.data) {
                 setFormData(response.data);
-                setAlertMessage("hola");
+                setAlertMessage("Empaque encontrado");
                 setOpenAlert(true);
             } else {
                 setAlertMessage("ID no encontrado.");

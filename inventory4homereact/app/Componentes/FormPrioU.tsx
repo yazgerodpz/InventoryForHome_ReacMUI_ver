@@ -72,7 +72,7 @@ const FormPrioU: React.FC<FormProps> = ({ onClose }) => {
 
       if (response.success && response.data) {
         setFormData(response.data);
-        setAlertMessage("hola");
+        setAlertMessage("Regla de prioridad encontrada");
         setOpenAlert(true);
       } else {
         setAlertMessage("ID no encontrado.");

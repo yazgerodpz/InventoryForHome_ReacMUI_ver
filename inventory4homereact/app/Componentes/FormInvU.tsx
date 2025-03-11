@@ -109,6 +109,25 @@ const FormInvU: React.FC<FormProps> = ({ onClose }) => {
         active: true,
     };
 
+   
+
+    const formatDate = (date: Date): string => {
+        if (!date) return ""; // Evita errores si date es null o undefined
+
+        // Si ya es un Date válido, lo formateamos
+        if (date instanceof Date && !isNaN(date.getTime())) {
+            return date.toISOString().split("T")[0]; // Convierte Date a YYYY-MM-DD
+        }
+
+        // Si llega como string (ej: "2024-03-10T15:30:00Z"), intenta convertirlo a Date
+        const parsedDate = new Date(date);
+        if (!isNaN(parsedDate.getTime())) {
+            return parsedDate.toISOString().split("T")[0];
+        }
+
+        return ""; // Retorna vacío si no se puede convertir
+      };
+
     const [formData, setFormData] = useState<invMain>(initialState);
     const [searchId, setSearchId] = useState<number | ''>(''); // Para buscar por id
     const [alertMessage, setAlertMessage] = useState<string | null>(null);
@@ -129,7 +148,7 @@ const FormInvU: React.FC<FormProps> = ({ onClose }) => {
 
             if (response.success && response.data) {
                 setFormData(response.data);
-                setAlertMessage("hola");
+                setAlertMessage("Artículo encontrado.");
                 setOpenAlert(true);
             } else {
                 setAlertMessage("ID no encontrado.");
@@ -172,14 +191,22 @@ const FormInvU: React.FC<FormProps> = ({ onClose }) => {
         }));
     };
 
-    const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
+    // const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    //     const { name, value } = e.target;
 
+    //     setFormData((prev) => ({
+    //         ...prev,
+    //         [name]: new Date(value),
+    //     }));
+    // };
+
+    const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = event.target;
         setFormData((prev) => ({
-            ...prev,
-            [name]: new Date(value),
+          ...prev,
+          [name]: new Date(value), // Convertir string YYYY-MM-DD de nuevo a Date
         }));
-    };
+      };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -189,11 +216,11 @@ const FormInvU: React.FC<FormProps> = ({ onClose }) => {
             const response = await apiServices.postData<{
                 success: boolean;
                 data: invMain;
-            }>("Prioridades/EditPrios/ActReglaPrio", formData);
+            }>("Inventario/EditarInv/actItem", formData);
             console.log('nueva regla de prioridad creada:', response);
             if (response.success) {
                 //Alerta
-                setAlertMessage("Regla de prioridad actualizada exitosamente");
+                setAlertMessage("Artículo actualizado exitosamente");
                 setAlertSeverity("success");
                 setOpenAlert(true);
                 // se reinicia el formulario
@@ -213,13 +240,13 @@ const FormInvU: React.FC<FormProps> = ({ onClose }) => {
                     onClose(); // Cerrar formulario después de 7 segundos
                 }, 1300);
             } else {
-                setAlertMessage("Error al actualizar la regla de prioridad");
+                setAlertMessage("Error al actualizar el artículo");
                 setAlertSeverity("error");
                 setOpenAlert(true);
             }
         } catch (error) {
             console.error("Error al enviar datos:", error);
-            setAlertMessage("Error al actualizar la regla de prioridad. Revisa la consola para más detalles.");
+            setAlertMessage("Error al actualizar el artículo. Revisa la consola para más detalles.");
             setAlertSeverity("error");
             setOpenAlert(true);
         }
@@ -374,7 +401,7 @@ const FormInvU: React.FC<FormProps> = ({ onClose }) => {
                                     label="Fecha de compra"
                                     type="date"
                                     name="purchesDate"
-                                    value={formData.purchesDate.toISOString().split('T')[0]}
+                                    value={formatDate(formData.purchesDate)}
                                     onChange={handleDateChange}
                                     InputLabelProps={{
                                         shrink: true,
@@ -388,9 +415,7 @@ const FormInvU: React.FC<FormProps> = ({ onClose }) => {
                         label="Expiration Date"
                         name="expirationDate"
                         type="date"
-                        value={formData.expirationDate
-                            .toISOString()
-                            .split('T')[0]}
+                        value={formatDate(formData.expirationDate)}
                         onChange={handleDateChange}
                         fullWidth
                         InputLabelProps={{ shrink: true }}

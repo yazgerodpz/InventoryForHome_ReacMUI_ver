@@ -111,6 +111,23 @@ const FormInvD: React.FC<FormProps> = ({ onClose }) => {
         active: true,
     };
 
+    const formatDate = (date: Date): string => {
+        if (!date) return ""; // Evita errores si date es null o undefined
+
+        // Si ya es un Date válido, lo formateamos
+        if (date instanceof Date && !isNaN(date.getTime())) {
+            return date.toISOString().split("T")[0]; // Convierte Date a YYYY-MM-DD
+        }
+
+        // Si llega como string (ej: "2024-03-10T15:30:00Z"), intenta convertirlo a Date
+        const parsedDate = new Date(date);
+        if (!isNaN(parsedDate.getTime())) {
+            return parsedDate.toISOString().split("T")[0];
+        }
+
+        return ""; // Retorna vacío si no se puede convertir
+      };
+
     const [formData, setFormData] = useState<invMain>(initialState);
     const [searchId, setSearchId] = useState<number | ''>(''); // Para buscar por id
     const [alertMessage, setAlertMessage] = useState<string | null>(null);
@@ -128,22 +145,27 @@ const FormInvD: React.FC<FormProps> = ({ onClose }) => {
         }
         try {
             const response: invApiMain = await apiServices.getData(`Inventario/ReadInvById/${searchId}`);
-
+    
             if (response.success && response.data) {
-                // Buscar los nombres correspondientes en los catálogos
                 const priority = mainPrio.find(p => p.idTypePrioritary === response.data.idTypePrioritary);
+                console.log("Priority found:", priority);
                 const stock = mainEmp.find(s => s.idTypeStock === response.data.idTypeStock);
-
-                // Asignar los valores a formData
+                console.log("Stock found:", stock);
+                
+            // Verificar si 'priority' es null o undefined
+            if (priority) {
+                console.log("Prioridad:", priority.typePrioritaryName);
+            }
+            if (stock) {
+                console.log("stock:", stock.typeStockName);
+            }
                 setFormData({
                     ...response.data,
-                    purchesDate: new Date(response.data.purchesDate),
-                    expirationDate: new Date(response.data.expirationDate),
                     typePrioritaryName: priority ? priority.typePrioritaryName : "Desconocido",
-                    typeStockName: stock ? stock.typeStockName : "Desconocido"
+                    typeStockName: stock ? stock.typeStockName : "Desconocido",
                 });
-                setFormData(response.data);
-                setAlertMessage("hola");
+    
+                setAlertMessage("Artículo encontrado.");
                 setOpenAlert(true);
             } else {
                 setAlertMessage("ID no encontrado.");
@@ -157,6 +179,7 @@ const FormInvD: React.FC<FormProps> = ({ onClose }) => {
             setOpenAlert(true);
         }
     };
+    
 
     const handleDelete = async () => {
         if (searchId === '' || typeof searchId !== 'number') {
@@ -241,23 +264,19 @@ const FormInvD: React.FC<FormProps> = ({ onClose }) => {
                     </p>
                     <br />
                     <p>
-                        <strong>Type Prioritary:</strong> {formData.typePrioritaryName}
+                        <strong>Type Prioritary:</strong> {formData.typePrioritaryName ?? "No disponible"}
                     </p>
                     <br />
                     <p>
-                        <strong>Type Stock:</strong> {formData.typeStockName}
+                        <strong>Type Stock:</strong> {formData.typeStockName ?? "No disponible"}
                     </p>
                     <br />
                     <p>
-                        <strong>Purchase Date:</strong> {formData.purchesDate instanceof Date 
-        ? formData.purchesDate.toISOString().split('T')[0] 
-        : "Fecha no válida"}
+                        <strong>Purchase Date:</strong> {formatDate(formData.purchesDate)}
                     </p>
                     <br />
                     <p>
-                        <strong>Expiration Date:</strong> {formData.expirationDate instanceof Date 
-        ? formData.expirationDate.toISOString().split('T')[0] 
-        : "Fecha no válida"}
+                        <strong>Expiration Date:</strong> {formatDate(formData.expirationDate)}
                     </p>
                     <br />
                     <p>
